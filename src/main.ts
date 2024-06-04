@@ -1,8 +1,6 @@
-interface Routes {
-  route: string; // /profile/:id
-  component: () => void;
-  subRoutes?: Routes[];
-}
+import { Routes } from "./types";
+import createButtonCache from "./utils/buttonCache";
+import createNavigation from "./utils/navigation";
 
 interface UIOptions {
   prefix?: string; // default: 'ui' // maxLength = 12
@@ -20,6 +18,7 @@ export default function createUI(options: UIOptions) {
     routeDirectory = "/ui",
     customRoutes,
     useFunctionalButtons = false,
+    functionalButtonTtl = 1800,
   } = options;
   if (prefix.length > 12) {
     throw new Error("Prefix length cannot be more than 12 characters");
@@ -32,12 +31,19 @@ export default function createUI(options: UIOptions) {
   const routes: Routes[] =
     customRoutes || getRoutesFromDirectory(routeDirectory);
 
+  // defaults
+
+  const buttonCache = createButtonCache(functionalButtonTtl);
+
   function onInteraction(interaction: any) {
     if (!interaction?.isButton() || !interaction?.isStringSelectMenu()) return;
     const { customId = "" } = interaction || {};
     const [_prefix, type, ...args] = customId.split(ARGS_DIVIDER);
 
     if (_prefix !== prefix) return;
+
+  const { navigate } = createNavigation(routes, interaction);
+
 
     switch (type) {
       case "n": // navigate
@@ -50,6 +56,7 @@ export default function createUI(options: UIOptions) {
           case "r": // route
             // ui>n>r>/profile/123482938747191284 // happens when route is smaller than 100 characters
             const route = arg;
+            navigate(route);
             break;
           default:
             break;
@@ -58,6 +65,8 @@ export default function createUI(options: UIOptions) {
       case "f": // function
         const [functionId] = args;
         // ui>f>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
+        const button = buttonCache.get(functionId);
+        button?.fn?.({ interaction, navigate });
         break;
       default:
         break;
