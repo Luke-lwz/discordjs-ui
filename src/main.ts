@@ -38,6 +38,7 @@ export default function createUI(options: UIOptions) {
   function onInteraction(interaction: any) {
     if (!interaction?.isButton() || !interaction?.isStringSelectMenu()) return;
     const { customId = "" } = interaction || {};
+    if (!customId?.startsWith(prefix + ARGS_DIVIDER)) return;
     const [_prefix, type, ...args] = customId.split(ARGS_DIVIDER);
 
     if (_prefix !== prefix) return;
