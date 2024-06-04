@@ -1,6 +1,7 @@
 interface ButtonInCacheFnProps {
     interaction: any;
     navigate: (route: string) => void;
+    pathname: string;
 }
 
 

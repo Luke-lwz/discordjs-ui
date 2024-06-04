@@ -42,8 +42,7 @@ export default function createUI(options: UIOptions) {
 
     if (_prefix !== prefix) return;
 
-  const { navigate } = createNavigation(routes, interaction);
-
+    const { navigate } = createNavigation(routes, interaction);
 
     switch (type) {
       case "n": // navigate
@@ -66,7 +65,7 @@ export default function createUI(options: UIOptions) {
         const [functionId] = args;
         // ui>f>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
         const button = buttonCache.get(functionId);
-        button?.fn?.({ interaction, navigate });
+        button?.fn?.({ interaction, navigate, pathname: button?.currentRoute });
         break;
       default:
         break;
