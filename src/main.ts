@@ -8,6 +8,7 @@ interface UIOptions {
   customRoutes?: Routes[]; // when provided, directory is not used
   useFunctionalButtons?: boolean; // default: false
   functionalButtonTtl?: number; // in seconds // default: 1800 (30 minutes)
+  globalMetadata?: any;
 }
 
 const ARGS_DIVIDER = ">";
@@ -19,6 +20,7 @@ export default function createUI(options: UIOptions) {
     customRoutes,
     useFunctionalButtons = false,
     functionalButtonTtl = 1800,
+    globalMetadata,
   } = options;
   if (prefix.length > 12) {
     throw new Error("Prefix length cannot be more than 12 characters");
@@ -43,7 +45,7 @@ export default function createUI(options: UIOptions) {
 
     if (_prefix !== prefix) return;
 
-    const { navigate } = createNavigation(routes, interaction);
+    const { navigate } = createNavigation(routes, interaction, globalMetadata);
 
     switch (type) {
       case "n": // navigate
