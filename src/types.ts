@@ -3,3 +3,15 @@ export interface Routes {
     component: () => void;
     subRoutes?: Routes[];
   }
+
+
+
+  export interface  UIMessage {
+    name: string;
+    description: string;
+  }
+
+  export interface UIMessageOptional extends Partial<UIMessage>{
+    name?: string;
+    description?: string;
+  }
