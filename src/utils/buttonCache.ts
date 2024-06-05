@@ -1,11 +1,11 @@
-interface ButtonInCacheFnProps {
+export interface ButtonInCacheFnProps {
     interaction: any;
     navigate: (route: string) => void;
     pathname: string;
 }
 
 
-interface ButtonInCache {
+export interface ButtonInCache {
   fn: (props: ButtonInCacheFnProps) => void;
   currentRoute: string;
   ttl: number;

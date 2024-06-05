@@ -1,2 +1,5 @@
 *.local
 node_modules
+/build/compiled
+/my-npm-package.d.ts
+/my-npm-package.min.js

@@ -2,7 +2,7 @@ import { Routes } from "./types";
 import createButtonCache from "./utils/buttonCache";
 import createNavigation from "./utils/navigation";
 
-interface UIOptions {
+export interface UIOptions {
   prefix?: string; // default: 'ui' // maxLength = 12
   routeDirectory?: string; // default: '/ui'
   customRoutes?: Routes[]; // when provided, directory is not used
