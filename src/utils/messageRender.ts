@@ -2,7 +2,7 @@
 
 
 export default function createMessageRenderers(interaction: any, uiMessage: any,) {
-    function render() {
+    function render(message: any) {
         
     }
 }
