@@ -1,7 +1,15 @@
-export interface Routes {
+export interface CustomRoutes {
     route: string; // /profile/:id
     component: () => void;
-    subRoutes?: Routes[];
+    subRoutes?: CustomRoutes[];
+  }
+
+  export interface RouteTree {
+    path?: string;
+    route: string;
+    isDirectory: boolean;
+    children: RouteTree[];
+    component?: () => void;
   }
 
 

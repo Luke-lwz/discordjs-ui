@@ -1,11 +1,9 @@
 {
-    "compilerOptions": {
-      "target": "es2017",
-      "moduleResolution": "node",
-      "outDir": "build/compiled",
-      "declaration": true
-    },
-    "include": [
-      "src"
-    ]
-  }
+  "compilerOptions": {
+    "target": "es2017",
+    "moduleResolution": "node",
+    "outDir": "build/compiled",
+    "declaration": true
+  },
+  "include": ["src"]
+}

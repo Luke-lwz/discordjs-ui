@@ -1,7 +1,7 @@
-import { Routes, UIMessageOptional } from "../types";
+import { RouteTree, UIMessageOptional } from "../types";
 
 
-export default function createNavigation(routes: Routes[], interaction: any, globalMetadata: any, messageDefault?: UIMessageOptional) {
+export default function createNavigation(routes: RouteTree[], interaction: any, globalMetadata: any, messageDefault?: UIMessageOptional) {
     function navigate(pathname: string, openNew = false) {
 
         // call function with this object

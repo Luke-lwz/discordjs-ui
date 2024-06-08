@@ -1,5 +1,10 @@
-import { Routes, UIMessage, UIMessageOptional } from "./types";
+import { CustomRoutes, RouteTree, UIMessage, UIMessageOptional } from "./types";
 import createButtonCache from "./utils/buttonCache";
+import {
+  getFileTree,
+  getRoutesFromCustomRoutes,
+  getRoutesFromDirectory,
+} from "./utils/routes";
 import createNavigation from "./utils/navigation";
 
 const fs = require("fs");
@@ -8,7 +13,7 @@ const path = require("path");
 export interface UIOptions {
   prefix?: string; // default: 'ui' // maxLength = 12
   routeDirectory?: string; // default: '/ui'
-  customRoutes?: Routes[]; // when provided, directory is not used
+  customRoutes?: CustomRoutes[]; // when provided, directory is not used
   useFunctionalButtons?: boolean; // default: false
   functionalButtonTtl?: number; // in seconds // default: 1800 (30 minutes)
   globalMetadata?: any;
@@ -34,8 +39,9 @@ export default function createUI(options: UIOptions) {
     throw new Error(`Prefix cannot contain '${ARGS_DIVIDER}' character`);
   }
 
-  const routes: Routes[] =
-    customRoutes || getRoutesFromDirectory(routeDirectory);
+  const routes: RouteTree[] = customRoutes
+    ? getRoutesFromCustomRoutes(customRoutes)
+    : getRoutesFromDirectory(routeDirectory);
 
   // defaults
 
@@ -112,84 +118,3 @@ export default function createUI(options: UIOptions) {
 
   return {};
 }
-
-function getRoutesFromDirectory(directory: string): Routes[] {
-  const rootDir = path.dirname(require.main.filename);
-
-  // Define the UI directory path
-  const uiDir = path.join(rootDir, (directory || "/ui").replace("/", ""));
-
-  if (!fs.existsSync(uiDir)) {
-    throw new Error(`UI directory not found at ${uiDir}`);
-  }
-
-  const files = fs.readdirSync(uiDir);
-  if (!files.length) {
-    throw new Error(`No files found in UI directory at ${uiDir}`);
-  }
-
-  console.log(getFileTree(uiDir));
-  return [];
-}
-
-
-
-interface FileTree {
-  path?: string;
-  route: string;
-  isDirectory: boolean;
-  children: FileTree[];
-  component?: () => void;
-}
-
-
-
-const ALLOWED_FILE_EXTENSIONS = [".js", ".ts"];
-const ALLOWED_FILE_NAMES = ["ui"];
-
-const EXCLUEDED_DIRECTORIES_REGEX = [/^_.*$/, /^\(.*$/];
-
-const getFileTree = (dir, baseRoute = ""): FileTree[] => {
-  const result = [];
-  const list = fs.readdirSync(dir);
-
-  list.forEach((file) => {
-    const filePath = path.join(dir, file);
-    const route = path.join(baseRoute, file);
-    const stat = fs.statSync(filePath);
-
-    const fileTreeNode = {
-      route,
-      isDirectory: stat.isDirectory(),
-      children: [],
-      component: undefined,
-    };
-
-    if (stat.isDirectory()) {
-      if (!EXCLUEDED_DIRECTORIES_REGEX.some((regex) => regex.test(file))) {
-        fileTreeNode.children = getFileTree(filePath, route);
-        result.push(fileTreeNode);
-      }
-    } else {
-      const fileExtension = path.extname(file);
-      const fileName = path.basename(file, fileExtension);
-      if (
-        ALLOWED_FILE_EXTENSIONS.includes(fileExtension) &&
-        ALLOWED_FILE_NAMES.includes(fileName)
-      ) {
-        try {
-          const module = require(filePath);
-          console.log(module);
-          fileTreeNode.component = module.default || module || undefined;
-
-          // remove any file extension from the route
-          fileTreeNode.route = route.replace(fileExtension, "");
-
-          if (fileTreeNode.component && typeof fileTreeNode.component === 'function') result.push(fileTreeNode);
-        } catch (error) {}
-      }
-    }
-  });
-
-  return result;
-};
