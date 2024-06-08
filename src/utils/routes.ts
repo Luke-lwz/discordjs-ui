@@ -7,14 +7,22 @@ const path = require("path");
 
 
 export function getRoutesFromCustomRoutes(customRoutes: CustomRoutes[] = []): RouteTree[] {
-  return customRoutes.map((route) => {
-    return {
-      route: route.route,
-      isDirectory: false,
-      children: route.subRoutes ? getRoutesFromCustomRoutes(route.subRoutes) : [],
-      component: route.component,
-    };
+
+  const routeTree: RouteTree[] = [];
+
+  customRoutes.forEach((customRoute) => {
+
+    const split = removeFirstLastSlash(customRoute.route).split("/");
+
+    
+
+    
   });
+
+  return routeTree;
+}
+function removeFirstLastSlash(s) {
+  return s.replace(/^\/|\/$/g, '');
 }
 
 
