@@ -10,7 +10,6 @@ export interface Routes {
     title: string;
     description?: string;
     embeds?: Embed[];
-    row1?: 
   }
 
   export interface UIMessageOptional extends Partial<UIMessage>{

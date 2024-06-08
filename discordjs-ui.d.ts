@@ -18,5 +18,6 @@ export interface UIOptions {
     useFunctionalButtons?: boolean
     functionalButtonTtl?: number
     globalMetadata?: any
+    messageDefault?: UIMessageOptional
 }
-export default function createUI(options: UIOptions): void
+export default function createUI(options: UIOptions): {}

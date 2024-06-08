@@ -2,6 +2,9 @@ import { Routes, UIMessage, UIMessageOptional } from "./types";
 import createButtonCache from "./utils/buttonCache";
 import createNavigation from "./utils/navigation";
 
+const fs = require("fs");
+const path = require("path");
+
 export interface UIOptions {
   prefix?: string; // default: 'ui' // maxLength = 12
   routeDirectory?: string; // default: '/ui'
@@ -23,7 +26,7 @@ export default function createUI(options: UIOptions) {
     functionalButtonTtl = 1800,
     globalMetadata,
     messageDefault = {},
-  } = options;
+  } = options || {};
   if (prefix.length > 12) {
     throw new Error("Prefix length cannot be more than 12 characters");
   }
@@ -31,27 +34,23 @@ export default function createUI(options: UIOptions) {
     throw new Error(`Prefix cannot contain '${ARGS_DIVIDER}' character`);
   }
 
-  const routePrefix = routeDirectory + prefix;
   const routes: Routes[] =
     customRoutes || getRoutesFromDirectory(routeDirectory);
 
   // defaults
 
+  return;
+
   const buttonCache = createButtonCache(functionalButtonTtl);
-
-
-
 
   // internal functions
 
   function uiMessage(message: UIMessage) {
     return {
-      name: message.name || messageDefault?.name || "",
+      name: message.title || messageDefault?.title || "",
       description: message.description || messageDefault?.description || "",
     };
   }
-
-
 
   // external functions (starter)
 
@@ -63,7 +62,12 @@ export default function createUI(options: UIOptions) {
 
     if (_prefix !== prefix) return;
 
-    const { navigate } = createNavigation(routes, interaction, globalMetadata, messageDefault);
+    const { navigate } = createNavigation(
+      routes,
+      interaction,
+      globalMetadata,
+      messageDefault
+    );
 
     switch (type) {
       case "n": // navigate
@@ -94,19 +98,98 @@ export default function createUI(options: UIOptions) {
     }
   }
 
-
   function openUI(interaction: any, route: string) {
     const WHITESPACECHAR = ".";
     // open ui
-    const { navigate } = createNavigation(routes, interaction, globalMetadata, messageDefault);
+    const { navigate } = createNavigation(
+      routes,
+      interaction,
+      globalMetadata,
+      messageDefault
+    );
     interaction?.deferReply();
   }
 
-
-
-  return {}
+  return {};
 }
 
 function getRoutesFromDirectory(directory: string): Routes[] {
+  const rootDir = path.dirname(require.main.filename);
+
+  // Define the UI directory path
+  const uiDir = path.join(rootDir, (directory || "/ui").replace("/", ""));
+
+  if (!fs.existsSync(uiDir)) {
+    throw new Error(`UI directory not found at ${uiDir}`);
+  }
+
+  const files = fs.readdirSync(uiDir);
+  if (!files.length) {
+    throw new Error(`No files found in UI directory at ${uiDir}`);
+  }
+
+  console.log(getFileTree(uiDir));
   return [];
 }
+
+
+
+interface FileTree {
+  path?: string;
+  route: string;
+  isDirectory: boolean;
+  children: FileTree[];
+  component?: () => void;
+}
+
+
+
+const ALLOWED_FILE_EXTENSIONS = [".js", ".ts"];
+const ALLOWED_FILE_NAMES = ["ui"];
+
+const EXCLUEDED_DIRECTORIES_REGEX = [/^_.*$/, /^\(.*$/];
+
+const getFileTree = (dir, baseRoute = ""): FileTree[] => {
+  const result = [];
+  const list = fs.readdirSync(dir);
+
+  list.forEach((file) => {
+    const filePath = path.join(dir, file);
+    const route = path.join(baseRoute, file);
+    const stat = fs.statSync(filePath);
+
+    const fileTreeNode = {
+      route,
+      isDirectory: stat.isDirectory(),
+      children: [],
+      component: undefined,
+    };
+
+    if (stat.isDirectory()) {
+      if (!EXCLUEDED_DIRECTORIES_REGEX.some((regex) => regex.test(file))) {
+        fileTreeNode.children = getFileTree(filePath, route);
+        result.push(fileTreeNode);
+      }
+    } else {
+      const fileExtension = path.extname(file);
+      const fileName = path.basename(file, fileExtension);
+      if (
+        ALLOWED_FILE_EXTENSIONS.includes(fileExtension) &&
+        ALLOWED_FILE_NAMES.includes(fileName)
+      ) {
+        try {
+          const module = require(filePath);
+          console.log(module);
+          fileTreeNode.component = module.default || module || undefined;
+
+          // remove any file extension from the route
+          fileTreeNode.route = route.replace(fileExtension, "");
+
+          if (fileTreeNode.component && typeof fileTreeNode.component === 'function') result.push(fileTreeNode);
+        } catch (error) {}
+      }
+    }
+  });
+
+  return result;
+};
