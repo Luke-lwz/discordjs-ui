@@ -45,7 +45,6 @@ export default function createUI(options: UIOptions) {
 
   // defaults
 
-  return;
 
   const buttonCache = createButtonCache(functionalButtonTtl);
 

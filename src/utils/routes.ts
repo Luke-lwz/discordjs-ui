@@ -6,7 +6,7 @@ const path = require("path");
 
 
 
-export function getRoutesFromCustomRoutes(customRoutes: CustomRoutes[] = []): RouteTree[] {
+export function getRoutesFromCustomRoutes(customRoutes: CustomRoutes[] = []): RouteTree[] { //todo: add custom routes type
 
   const routeTree: RouteTree[] = [];
 
