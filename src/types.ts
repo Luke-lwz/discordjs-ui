@@ -33,10 +33,7 @@ export interface UIMessageCustomButton {
   onClick?: () => void; // will overwrite navigateTo
   label?: string;
   style?: number;
-  emoji?: {
-    name: string;
-    animated: boolean;
-  };
+  emoji?: string;
   url?: string;
   disabled?: boolean;
 }
@@ -44,6 +41,7 @@ export interface UIMessageCustomButton {
 export interface UIMessageCustomSelectMenu {
   type: 3;
   placeholder: string;
+  custom_id?: string;
   options: UIMessageCustomSelectOption[];
 }
 

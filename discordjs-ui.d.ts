@@ -14,7 +14,7 @@
 export interface UIOptions {
     prefix?: string
     routeDirectory?: string
-    customRoutes?: Routes[]
+    customRoutes?: CustomRoutes[]
     useFunctionalButtons?: boolean
     functionalButtonTtl?: number
     globalMetadata?: any
