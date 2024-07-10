@@ -11,7 +11,12 @@ export function createUIRender(interaction: any) {
       if (interaction?.deffered || interaction?.replied) {
         await interaction?.editReply?.(msg);
       } else {
-        await interaction?.update?.(msg);
+        if (interaction?.message) {
+            await interaction?.update?.(msg);
+        } else {
+            await interaction?.reply?.(msg);
+        }
+            
       }
     } catch (e) {
       console.error(e);

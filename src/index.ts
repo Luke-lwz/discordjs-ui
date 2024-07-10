@@ -199,8 +199,6 @@ function createUI(options: UIOptions) {
 
     if (uiFn) {
       try {
-        console.log(interaction)
-        await interaction?.reply?.({ ephemeral: messageDefault?.ephemeral, content: "🔄️ Loading...",});
         uiFn?.component?.(props);
       } catch (e) {}
     }
