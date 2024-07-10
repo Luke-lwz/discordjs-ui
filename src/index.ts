@@ -5,13 +5,12 @@ import {
   getRoutesFromCustomRoutes,
   getRoutesFromDirectory,
 } from "./utils/routes";
-import createNavigation, { getRouteFromUUID } from "./utils/navigation";
+import createNavigation from "./utils/navigation";
+import { getRouteFromUUID } from "./utils/routes";
 import { getBuilders } from "./utils/componentBuilders";
 import { ARGS_DIVIDER, PREFIX_LENGTH } from "./utils/CONSTANTS";
 import { ButtonBuilder } from "discord.js";
 
-const fs = require("fs");
-const path = require("path");
 
 export interface UIOptions {
   prefix?: string; // default: 'ui' // maxLength = 12
@@ -28,7 +27,7 @@ export default function createUI(options: UIOptions) {
   const {
     prefix = "ui",
     routeDirectory = "/ui",
-    customRoutes,
+    customRoutes = null,
     useFunctionalButtons = false,
     functionalButtonTtl = 1800,
     globalMetadata,
@@ -45,29 +44,14 @@ export default function createUI(options: UIOptions) {
     ? getRoutesFromCustomRoutes(customRoutes)
     : getRoutesFromDirectory(routeDirectory);
 
+    console.log("äääää", routes)
   // defaults
 
 
-
-
-  return 
-
-
-  const buttonCache = createButtonCache(functionalButtonTtl);
-
-  // internal functions
-
-  function uiMessage(message: UIMessage) {
-    // return {
-    //   name: message.title || messageDefault?.title || "",
-    //   description: message.description || messageDefault?.description || "",
-    // };
-  }
-
-  // external functions (starter)
+  onInteraction({isButton: () => true, isStringSelectMenu: () => true, customId: "ui>n>r>/profile/123482938747191284" }) //test
 
   function onInteraction(interaction: any) {
-    if (!interaction?.isButton() || !interaction?.isStringSelectMenu()) return;
+    if (!interaction?.isButton() && !interaction?.isStringSelectMenu()) return;
     const { customId = "" } = interaction || {};
     if (!customId?.startsWith(prefix + ARGS_DIVIDER)) return;
     const [_prefix, type, ...args] = customId.split(ARGS_DIVIDER);
@@ -76,7 +60,13 @@ export default function createUI(options: UIOptions) {
 
     const route = "" // edit this 🚨🚨🚨🚨🚨🚨🚨
 
+  const buttonCache = createButtonCache(functionalButtonTtl);
+
+
   const {UIButtonBuilder} = getBuilders(prefix, buttonCache, route);
+
+
+  console.log("ööö", routes)
 
 
     const { navigate } = createNavigation(
@@ -128,6 +118,24 @@ export default function createUI(options: UIOptions) {
         break;
     }
   }
+
+  return 
+
+
+
+  // internal functions
+
+  function uiMessage(message: UIMessage) {
+    // return {
+    //   name: message.title || messageDefault?.title || "",
+    //   description: message.description || messageDefault?.description || "",
+    // };
+  }
+
+  // external functions (starter)
+
+
+  
 
   function openUI(interaction: any, route: string) {
     const WHITESPACECHAR = ".";

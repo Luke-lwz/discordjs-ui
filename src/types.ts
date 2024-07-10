@@ -1,4 +1,16 @@
-import { NavigatePropsProps } from "./utils/navigation";
+// Navigation
+export interface NavigatePropsProps {
+  interaction: any;
+  navigate: (pathname: string) => void;
+  pathname: string;
+  route: string;
+  globalMetadata: any;
+  UIButtonBuilder: any;
+}
+
+export interface NavigateOptions {
+  blank?: boolean;
+}
 
 export interface CustomRoutes {
   route: string; // /profile/:id

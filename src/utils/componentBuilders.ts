@@ -4,7 +4,7 @@ import {
   UIMessageCustomButton,
   UIMessageCustomSelectMenu,
 } from "../types";
-import { encodeRoute } from "./navigation";
+import { encodeRoute } from "./routes";
 import { ARGS_DIVIDER } from "./CONSTANTS";
 
 const ERROR_SUFFIX = " (UIButtonBuilder)";

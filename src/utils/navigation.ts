@@ -1,24 +1,9 @@
-import { RouteTree, UIMessageOptional } from "../types";
+import { NavigateOptions, NavigatePropsProps, RouteTree, UIMessageOptional } from "../types";
 
-import { v4 as uuidv4 } from "uuid";
 
-import { LocalStorage } from "node-localstorage";
-import { ARGS_DIVIDER } from "./CONSTANTS";
-import * as path from "path";
 import { getBuilders } from "./componentBuilders";
 
-export interface NavigatePropsProps {
-  interaction: any;
-  navigate: (pathname: string) => void;
-  pathname: string;
-  route: string;
-  globalMetadata: any;
-  UIButtonBuilder: any;
-}
 
-export interface NavigateOptions {
-  blank?: boolean;
-}
 
 export default function createNavigation(
   routes: RouteTree[],
@@ -28,7 +13,10 @@ export default function createNavigation(
   prefix: string = "ui",
   buttonCache?: any
 ) {
-  function navigate(pathname: string, options: NavigateOptions = {}) {
+
+    navigate("/test/1234") // test
+
+  function navigate(pathname: string, options: NavigateOptions= {}) {
     const { UIButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
 
     if (options.blank) {
@@ -42,14 +30,17 @@ export default function createNavigation(
     var currentRouteTree = routes;
 
     const pathnameSplit = pathname.split("/");
+    if (pathnameSplit[0] === "") pathnameSplit.shift();
 
     let notFound = false;
 
     pathnameSplit.forEach((part, index) => {
+      
       if (notFound) return;
       let directoryFound = false;
       for (let i = 0; i < currentRouteTree.length; i++) {
         const route = currentRouteTree[i];
+
 
         if (route.isDirectory) {
           if (/\[.*\]/g.test(route.route)) {
@@ -79,7 +70,10 @@ export default function createNavigation(
       }
     });
 
+
     const uiFn = currentRouteTree.find((r) => r.route === "ui");
+
+    console.log(uiFn)
 
     if (notFound || !uiFn) {
       console.log("Route not found (" + pathname + ")");
@@ -113,38 +107,3 @@ export default function createNavigation(
   };
 }
 
-const maxLength = 100;
-
-const uuidLocalStorage = new LocalStorage(
-  "./discordjs-ui/localStorage/routes/uuid"
-);
-const routeLocalStorage = new LocalStorage(
-  "./discordjs-ui/localStorage/routes/route"
-);
-
-export function encodeRoute(route: string, prefix: string) {
-  // ui>n>r>/profile/123482938747191284
-  let btnId = `${prefix}${ARGS_DIVIDER}n${ARGS_DIVIDER}r${ARGS_DIVIDER}${route}`;
-  if (btnId.length > maxLength) {
-    // use cache
-    const uuidFromNds = routeLocalStorage.getItem(btnId);
-    if (!uuidFromNds) {
-      // if the route is  not in cache set it
-      const cacheId = uuidv4();
-      routeLocalStorage.setItem(btnId, cacheId);
-      uuidLocalStorage.setItem(cacheId, route);
-      // ui>n>c>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
-      btnId = `${prefix}${ARGS_DIVIDER}n${ARGS_DIVIDER}c${ARGS_DIVIDER}${cacheId}`;
-    } else {
-      // already exists
-
-      btnId = `${prefix}${ARGS_DIVIDER}n${ARGS_DIVIDER}c${ARGS_DIVIDER}${uuidFromNds}`;
-    }
-  }
-
-  return btnId;
-}
-
-export function getRouteFromUUID(uuid: string) {
-  return uuidLocalStorage.getItem(uuid);
-}
