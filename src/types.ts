@@ -1,7 +1,20 @@
+import { UIRenderOptions } from "./utils/uiRender";
+
+
+// slash commands
+export interface SlashCommands {
+  command: any;
+  navigateTo: string;
+}
+
+
+
+
 // Navigation
 export interface NavigatePropsProps {
   interaction: any;
   navigate: (pathname: string) => void;
+  render: (msg: any, options: UIRenderOptions) => void;
   pathname: string;
   route: string;
   params: {

@@ -1,40 +1,38 @@
-import { REST, Routes } from 'discord.js';
+import { REST, Routes } from "discord.js";
+import { SlashCommands } from "../types";
 
 interface GetRegisterSlashCommandsFunctionProps {
-clientId: string;
-token: string;
-guildId?: string;
+  clientId: string;
+  token: string;
+  guildId?: string;
+}
 
-} 
+export function createRegisterSlashCommandsFunction(
+  props: GetRegisterSlashCommandsFunctionProps
+) {
+  const { clientId, token, guildId } = props;
 
-
-export class SlashCommandsRegisterFunction {
-  private _clientId: string;
-  private _token: string;
-  private _guildId: string;
-
-  constructor(props: GetRegisterSlashCommandsFunctionProps) {
-    this._clientId = props.clientId;
-    this._token = props.token;
-    this._guildId = props.guildId;
-  }
-
-  public async registerSlashCommands(slashCommands: any[]) {
-    const rest = new REST({ version: '9' }).setToken(this._token);
+  // Inline class logic or use an instance of the class
+  const registerSlashCommands = async (slashCommands: SlashCommands[]) => {
+    const rest = new REST().setToken(token);
 
     try {
-      console.log('Started refreshing application (/) commands.');
+      console.log("Started refreshing application (/) commands.");
+
+      const slashCommandsJson = slashCommands?.map((command) => command?.command?.toJSON())?.filter(c => c) ||[]
 
       await rest.put(
-        this._guildId
-          ? Routes.applicationGuildCommands(this._clientId, this._guildId)
-          : Routes.applicationCommands(this._clientId),
-        { body: slashCommands },
+        guildId
+          ? Routes.applicationGuildCommands(clientId, guildId)
+          : Routes.applicationCommands(clientId),
+        { body: slashCommandsJson }
       );
 
-      console.log('Successfully reloaded application (/) commands.');
+      console.log("Successfully reloaded application (/) commands.");
     } catch (error) {
       console.error(error);
     }
-  }
+  };
+
+  return registerSlashCommands;
 }

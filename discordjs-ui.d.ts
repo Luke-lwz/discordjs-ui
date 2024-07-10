@@ -23,12 +23,8 @@ export interface UIOptions {
     globalMetadata?: any
     messageDefault?: UIMessageOptional
 }
-export interface SlashCommands {
-    command: any
-    navigateTo: string
-}
 declare function createUI(options: UIOptions): {
-    openUI: (interaction: any, pathname: string) => void
+    openUI: (interaction: any, pathname: string) => Promise<void>
     onInteraction: (interaction: any) => void
 }
-export { SlashCommandsRegisterFunction, createUI }
+export { createRegisterSlashCommandsFunction, createUI }

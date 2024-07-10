@@ -6,6 +6,7 @@ import {
 } from "../types";
 
 import { getBuilders } from "./componentBuilders";
+import { createUIRender } from "./uiRender";
 
 export default function createNavigation(
   routes: RouteTree[],
@@ -25,6 +26,9 @@ export default function createNavigation(
 
 
     const { uiFn, routeName, params } = getUIFnAndRouteNameAndParams(pathname, routes);
+
+    const render = createUIRender(interaction);
+
     
 
     const props: NavigatePropsProps = {
@@ -35,6 +39,7 @@ export default function createNavigation(
       params,
       globalMetadata,
       UIButtonBuilder,
+      render,
     };
 
     if (uiFn) uiFn?.component?.(props);
@@ -101,7 +106,6 @@ export function getUIFnAndRouteNameAndParams(pathname: string, routes: RouteTree
 
     const uiFn = currentRouteTree.find((r) => r.route === "ui");
 
-    console.log(uiFn);
 
     if (notFound || !uiFn) {
       console.log("Route not found (" + pathname + ")");

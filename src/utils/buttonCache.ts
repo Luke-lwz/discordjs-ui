@@ -7,15 +7,15 @@ export interface ButtonInCacheFnProps {
 
 export interface ButtonInCache {
   fn: (props: ButtonInCacheFnProps) => void;
-  currentRoute: string;
+  currentPathname: string;
   ttl: number;
 }
 
 export default function createButtonCache(ttl: number) {
   const cache: Map<string, ButtonInCache> = new Map();
 
-  function set(key: string, fn: () => void, currentRoute: string) {
-    const obj = { fn, ttl: Date.now() + ttl * 1000, currentRoute };
+  function set(key: string, fn: () => void, currentPathname: string) {
+    const obj = { fn, ttl: Date.now() + ttl * 1000, currentPathname };
     cache.set(key, obj);
   }
 
