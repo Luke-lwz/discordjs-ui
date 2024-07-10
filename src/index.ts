@@ -83,7 +83,9 @@ export default function createUI(options: UIOptions) {
       routes,
       interaction,
       globalMetadata,
-      messageDefault
+      messageDefault,
+      prefix,
+      buttonCache,
     );
 
     const props = {
@@ -102,6 +104,9 @@ export default function createUI(options: UIOptions) {
           case "c": // cache
             // ui>n>c>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
             const id = arg;
+            const r = getRouteFromUUID(id);
+            if (!r) return;
+            navigate(r);
             break;
           case "r": // route
             // ui>n>r>/profile/123482938747191284 // happens when route is smaller than 100 characters

@@ -1,3 +1,5 @@
+import { NavigatePropsProps } from "./utils/navigation";
+
 export interface CustomRoutes {
   route: string; // /profile/:id
   component: () => void;
@@ -9,7 +11,7 @@ export interface RouteTree {
   route: string;
   isDirectory: boolean;
   children: RouteTree[];
-  component?: () => void;
+  component?: (props: NavigatePropsProps) => void;
 }
 
 export interface UIMessage {
