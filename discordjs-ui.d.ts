@@ -12,6 +12,9 @@
 // -- Entry point definition --
 
 export interface UIOptions {
+    client: any
+    slashCommands?: SlashCommands[]
+    slashCommandRegisterFunction?: (slashCommands: SlashCommands[]) => void
     prefix?: string
     routeDirectory?: string
     customRoutes?: CustomRoutes[]
@@ -20,7 +23,12 @@ export interface UIOptions {
     globalMetadata?: any
     messageDefault?: UIMessageOptional
 }
-export default function createUI(options: UIOptions): {
+export interface SlashCommands {
+    command: any
+    navigateTo: string
+}
+declare function createUI(options: UIOptions): {
     openUI: (interaction: any, pathname: string) => void
     onInteraction: (interaction: any) => void
 }
+export { SlashCommandsRegisterFunction, createUI }

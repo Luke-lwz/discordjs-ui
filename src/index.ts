@@ -1,17 +1,28 @@
-import { CustomRoutes, NavigatePropsProps, RouteTree, UIMessage, UIMessageOptional } from "./types";
+import {
+  CustomRoutes,
+  NavigatePropsProps,
+  RouteTree,
+  UIMessage,
+  UIMessageOptional,
+} from "./types";
 import createButtonCache from "./utils/buttonCache";
 import {
   getFileTree,
   getRoutesFromCustomRoutes,
   getRoutesFromDirectory,
 } from "./utils/routes";
-import createNavigation, { getUIFnAndRouteNameAndParams } from "./utils/navigation";
+import createNavigation, {
+  getUIFnAndRouteNameAndParams,
+} from "./utils/navigation";
 import { getRouteFromUUID } from "./utils/routes";
 import { getBuilders } from "./utils/componentBuilders";
 import { ARGS_DIVIDER, PREFIX_LENGTH } from "./utils/CONSTANTS";
-import { ButtonBuilder } from "discord.js";
+import { SlashCommandsRegisterFunction } from "./utils/slashCommandFunction";
 
 export interface UIOptions {
+  client: any;
+  slashCommands?: SlashCommands[];
+  slashCommandRegisterFunction?: (slashCommands: SlashCommands[]) => void;
   prefix?: string; // default: 'ui' // maxLength = 12
   routeDirectory?: string; // default: '/ui'
   customRoutes?: CustomRoutes[]; // when provided, directory is not used
@@ -21,7 +32,12 @@ export interface UIOptions {
   messageDefault?: UIMessageOptional;
 }
 
-export default function createUI(options: UIOptions) {
+export interface SlashCommands {
+  command: any;
+  navigateTo: string;
+}
+
+function createUI(options: UIOptions) {
   const {
     prefix = "ui",
     routeDirectory = "/ui",
@@ -30,7 +46,20 @@ export default function createUI(options: UIOptions) {
     functionalButtonTtl = 1800,
     globalMetadata,
     messageDefault = {},
+    slashCommands = [],
+    slashCommandRegisterFunction = null,
   } = options || {};
+
+  // if (!client) {
+  //   throw new Error("Client is required");
+  // }
+
+  if (slashCommands.length > 0 && !slashCommandRegisterFunction) {
+    throw new Error(
+      "slashCommandRegisterFunction is required when slashCommands are provided"
+    );
+  }
+
   if (prefix.length > PREFIX_LENGTH) {
     throw new Error("Prefix length cannot be more than 12 characters");
   }
@@ -38,12 +67,16 @@ export default function createUI(options: UIOptions) {
     throw new Error(`Prefix cannot contain '${ARGS_DIVIDER}' character`);
   }
 
+  // register slash commands
+  if (slashCommandRegisterFunction && slashCommands?.length > 0)
+    slashCommandRegisterFunction(slashCommands);
+
+  // generate routes
   const routes: RouteTree[] = customRoutes
     ? getRoutesFromCustomRoutes(customRoutes)
     : getRoutesFromDirectory(routeDirectory);
 
-    const buttonCache = createButtonCache(functionalButtonTtl);
-
+  const buttonCache = createButtonCache(functionalButtonTtl);
 
   // defaults
 
@@ -51,15 +84,9 @@ export default function createUI(options: UIOptions) {
 
   // internal functions
 
-  function uiMessage(message: UIMessage) {
-    // return {
-    //   name: message.title || messageDefault?.title || "",
-    //   description: message.description || messageDefault?.description || "",
-    // };
-  }
-
   // external functions (starter)
   function onInteraction(interaction: any) {
+    console.log(interaction);
     if (!interaction?.isButton() && !interaction?.isStringSelectMenu()) return;
     const { customId = "" } = interaction || {};
     if (!customId?.startsWith(prefix + ARGS_DIVIDER)) return;
@@ -130,10 +157,12 @@ export default function createUI(options: UIOptions) {
       messageDefault
     );
 
-
     const { UIButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
 
-    const {uiFn, routeName, params} = getUIFnAndRouteNameAndParams(pathname, routes);
+    const { uiFn, routeName, params } = getUIFnAndRouteNameAndParams(
+      pathname,
+      routes
+    );
 
     const props: NavigatePropsProps = {
       interaction,
@@ -145,13 +174,13 @@ export default function createUI(options: UIOptions) {
       globalMetadata,
     };
 
-    if (interaction?.deferReply && (typeof interaction.deferReply === "function")) interaction?.deferReply?.();
-
+    if (interaction?.deferReply && typeof interaction.deferReply === "function")
+      interaction?.deferReply?.();
 
     if (uiFn) uiFn?.component?.(props);
-
-
   }
 
-  return {openUI, onInteraction};
+  return { openUI, onInteraction };
 }
+
+export { SlashCommandsRegisterFunction, createUI };
