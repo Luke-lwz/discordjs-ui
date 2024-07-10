@@ -12,7 +12,7 @@ const ERROR_SUFFIX = " (UIButtonBuilder)";
 
 // make custom builder classes based on these types
 
-export function getBuilders(prefix: string, buttonCache: any, currentRoute: string) {
+export function getBuilders(prefix: string, buttonCache: any, currentPathname: string) {
   class UIButtonBuilder {
     button: UIMessageCustomButton = {
       type: 2,
@@ -104,7 +104,7 @@ export function getBuilders(prefix: string, buttonCache: any, currentRoute: stri
 
       if (onClick) {
         let key: string = this.onClickKey
-        buttonCache.set(key, onClick, currentRoute);
+        buttonCache.set(key, onClick, currentPathname);
       } else if (navigateTo) {
         custom_id = encodeRoute(navigateTo, prefix);
       }

@@ -1,16 +1,15 @@
-import { CustomRoutes, RouteTree, UIMessage, UIMessageOptional } from "./types";
+import { CustomRoutes, NavigatePropsProps, RouteTree, UIMessage, UIMessageOptional } from "./types";
 import createButtonCache from "./utils/buttonCache";
 import {
   getFileTree,
   getRoutesFromCustomRoutes,
   getRoutesFromDirectory,
 } from "./utils/routes";
-import createNavigation from "./utils/navigation";
+import createNavigation, { getUIFnAndRouteNameAndParams } from "./utils/navigation";
 import { getRouteFromUUID } from "./utils/routes";
 import { getBuilders } from "./utils/componentBuilders";
 import { ARGS_DIVIDER, PREFIX_LENGTH } from "./utils/CONSTANTS";
 import { ButtonBuilder } from "discord.js";
-
 
 export interface UIOptions {
   prefix?: string; // default: 'ui' // maxLength = 12
@@ -21,7 +20,6 @@ export interface UIOptions {
   globalMetadata?: any;
   messageDefault?: UIMessageOptional;
 }
-
 
 export default function createUI(options: UIOptions) {
   const {
@@ -44,12 +42,23 @@ export default function createUI(options: UIOptions) {
     ? getRoutesFromCustomRoutes(customRoutes)
     : getRoutesFromDirectory(routeDirectory);
 
-    console.log("äääää", routes)
+    const buttonCache = createButtonCache(functionalButtonTtl);
+
+
   // defaults
 
+  // onInteraction({isButton: () => true, isStringSelectMenu: () => true, customId: "ui>n>r>/profile/123482938747191284" }) //test
 
-  onInteraction({isButton: () => true, isStringSelectMenu: () => true, customId: "ui>n>r>/profile/123482938747191284" }) //test
+  // internal functions
 
+  function uiMessage(message: UIMessage) {
+    // return {
+    //   name: message.title || messageDefault?.title || "",
+    //   description: message.description || messageDefault?.description || "",
+    // };
+  }
+
+  // external functions (starter)
   function onInteraction(interaction: any) {
     if (!interaction?.isButton() && !interaction?.isStringSelectMenu()) return;
     const { customId = "" } = interaction || {};
@@ -58,16 +67,9 @@ export default function createUI(options: UIOptions) {
 
     if (_prefix !== prefix) return;
 
-    const route = "" // edit this 🚨🚨🚨🚨🚨🚨🚨
+    const route = ""; // edit this 🚨🚨🚨🚨🚨🚨🚨
 
-  const buttonCache = createButtonCache(functionalButtonTtl);
-
-
-  const {UIButtonBuilder} = getBuilders(prefix, buttonCache, route);
-
-
-  console.log("ööö", routes)
-
+    const { UIButtonBuilder } = getBuilders(prefix, buttonCache, route);
 
     const { navigate } = createNavigation(
       routes,
@@ -75,7 +77,7 @@ export default function createUI(options: UIOptions) {
       globalMetadata,
       messageDefault,
       prefix,
-      buttonCache,
+      buttonCache
     );
 
     const props = {
@@ -119,26 +121,7 @@ export default function createUI(options: UIOptions) {
     }
   }
 
-  return 
-
-
-
-  // internal functions
-
-  function uiMessage(message: UIMessage) {
-    // return {
-    //   name: message.title || messageDefault?.title || "",
-    //   description: message.description || messageDefault?.description || "",
-    // };
-  }
-
-  // external functions (starter)
-
-
-  
-
-  function openUI(interaction: any, route: string) {
-    const WHITESPACECHAR = ".";
+  function openUI(interaction: any, pathname: string) {
     // open ui
     const { navigate } = createNavigation(
       routes,
@@ -146,8 +129,29 @@ export default function createUI(options: UIOptions) {
       globalMetadata,
       messageDefault
     );
-    interaction?.deferReply();
+
+
+    const { UIButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
+
+    const {uiFn, routeName, params} = getUIFnAndRouteNameAndParams(pathname, routes);
+
+    const props: NavigatePropsProps = {
+      interaction,
+      navigate,
+      pathname,
+      params,
+      route: routeName,
+      UIButtonBuilder,
+      globalMetadata,
+    };
+
+    if (interaction?.deferReply && (typeof interaction.deferReply === "function")) interaction?.deferReply?.();
+
+
+    if (uiFn) uiFn?.component?.(props);
+
+
   }
 
-  return {};
+  return {openUI, onInteraction};
 }

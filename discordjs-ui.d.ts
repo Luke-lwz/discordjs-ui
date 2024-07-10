@@ -20,4 +20,7 @@ export interface UIOptions {
     globalMetadata?: any
     messageDefault?: UIMessageOptional
 }
-export default function createUI(options: UIOptions): {}
+export default function createUI(options: UIOptions): {
+    openUI: (interaction: any, pathname: string) => void
+    onInteraction: (interaction: any) => void
+}

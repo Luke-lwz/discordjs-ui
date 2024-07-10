@@ -4,6 +4,9 @@ export interface NavigatePropsProps {
   navigate: (pathname: string) => void;
   pathname: string;
   route: string;
+  params: {
+    [key: string]: string;
+  }
   globalMetadata: any;
   UIButtonBuilder: any;
 }

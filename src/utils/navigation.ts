@@ -1,9 +1,11 @@
-import { NavigateOptions, NavigatePropsProps, RouteTree, UIMessageOptional } from "../types";
-
+import {
+  NavigateOptions,
+  NavigatePropsProps,
+  RouteTree,
+  UIMessageOptional,
+} from "../types";
 
 import { getBuilders } from "./componentBuilders";
-
-
 
 export default function createNavigation(
   routes: RouteTree[],
@@ -13,10 +15,7 @@ export default function createNavigation(
   prefix: string = "ui",
   buttonCache?: any
 ) {
-
-    navigate("/test/1234") // test
-
-  function navigate(pathname: string, options: NavigateOptions= {}) {
+  function navigate(pathname: string, options: NavigateOptions = {}) {
     const { UIButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
 
     if (options.blank) {
@@ -24,7 +23,39 @@ export default function createNavigation(
       return;
     }
 
-    const params = {};
+
+    const { uiFn, routeName, params } = getUIFnAndRouteNameAndParams(pathname, routes);
+    
+
+    const props: NavigatePropsProps = {
+      interaction: interaction,
+      navigate,
+      pathname,
+      route: routeName,
+      params,
+      globalMetadata,
+      UIButtonBuilder,
+    };
+
+    if (uiFn) uiFn?.component?.(props);
+  }
+
+  return {
+    navigate,
+  };
+}
+
+
+
+
+interface GetUIFnAndRouteNameAndParamsReturns {
+  uiFn?: RouteTree;
+  routeName?: string;
+  params?: any;
+}
+
+export function getUIFnAndRouteNameAndParams(pathname: string, routes: RouteTree[]): GetUIFnAndRouteNameAndParamsReturns | undefined{
+  const params = {};
     let routeName = "/";
 
     var currentRouteTree = routes;
@@ -35,12 +66,10 @@ export default function createNavigation(
     let notFound = false;
 
     pathnameSplit.forEach((part, index) => {
-      
       if (notFound) return;
       let directoryFound = false;
       for (let i = 0; i < currentRouteTree.length; i++) {
         const route = currentRouteTree[i];
-
 
         if (route.isDirectory) {
           if (/\[.*\]/g.test(route.route)) {
@@ -70,40 +99,25 @@ export default function createNavigation(
       }
     });
 
-
     const uiFn = currentRouteTree.find((r) => r.route === "ui");
 
-    console.log(uiFn)
+    console.log(uiFn);
 
     if (notFound || !uiFn) {
       console.log("Route not found (" + pathname + ")");
 
       // 404 Embed 🚨
 
-      return;
+      return {};
     }
 
     // call function with this object
 
     if (!(typeof uiFn.component === "function")) {
       console.error("Component is not a function (" + pathname + ")");
-      return;
+      return {};
     }
 
-    const props: NavigatePropsProps = {
-      interaction: interaction,
-      navigate,
-      pathname,
-      route: routeName,
-      globalMetadata,
-      UIButtonBuilder,
-    };
 
-    uiFn?.component?.(props);
-  }
-
-  return {
-    navigate,
-  };
+    return { uiFn, routeName, params };
 }
-
