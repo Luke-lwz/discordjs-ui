@@ -104,7 +104,7 @@ function createUI(options: UIOptions) {
 
       const { UIButtonBuilder } = getBuilders(prefix, buttonCache, route);
 
-      const render = createUIRender(interaction);
+      const { render, deferRender } = createUIRender(interaction);
 
       const { navigate } = createNavigation(
         routes,
@@ -114,7 +114,6 @@ function createUI(options: UIOptions) {
         prefix,
         buttonCache
       );
-
 
       switch (type) {
         case "n": // navigate
@@ -157,6 +156,7 @@ function createUI(options: UIOptions) {
             UIButtonBuilder,
             globalMetadata,
             render,
+            deferRender,
           };
 
           button?.fn?.(props);
@@ -178,7 +178,7 @@ function createUI(options: UIOptions) {
 
     const { UIButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
 
-    const render = createUIRender(interaction);
+    const { render, deferRender } = createUIRender(interaction);
 
     const { uiFn, routeName, params } = getUIFnAndRouteNameAndParams(
       pathname,
@@ -193,9 +193,9 @@ function createUI(options: UIOptions) {
       route: routeName,
       UIButtonBuilder,
       globalMetadata,
-      render
+      render,
+      deferRender,
     };
-
 
     if (uiFn) {
       try {

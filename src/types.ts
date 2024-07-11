@@ -15,6 +15,7 @@ export interface NavigatePropsProps {
   interaction: any;
   navigate: (pathname: string) => void;
   render: (msg: any, options: UIRenderOptions) => void;
+  deferRender: () => void;
   pathname: string;
   route: string;
   params: {

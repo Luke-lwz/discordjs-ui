@@ -22,5 +22,18 @@ export function createUIRender(interaction: any) {
       console.error(e);
     }
   }
-  return render;
+
+  async function deferRender() {
+    try {
+        if (interaction?.message) {
+            await interaction?.deferUpdate?.();
+        } else {
+            await interaction?.deferReply?.();
+        }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  return {render, deferRender};
 }

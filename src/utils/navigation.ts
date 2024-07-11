@@ -27,7 +27,7 @@ export default function createNavigation(
 
     const { uiFn, routeName, params } = getUIFnAndRouteNameAndParams(pathname, routes);
 
-    const render = createUIRender(interaction);
+    const { render, deferRender } = createUIRender(interaction);
 
     
 
@@ -40,6 +40,7 @@ export default function createNavigation(
       globalMetadata,
       UIButtonBuilder,
       render,
+      deferRender,
     };
 
     if (uiFn) uiFn?.component?.(props);
