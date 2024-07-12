@@ -107,7 +107,20 @@ export function getUIFnAndRouteNameAndParams(
     for (let i = 0; i < currentRouteTree.length; i++) {
       const route = currentRouteTree[i];
 
+
+      
+
       if (route.isDirectory) {
+        if (route.route === part) {
+          routeName += `/${part}`;
+  
+      console.log(part, route.route, route.children?.length)
+
+          //
+          currentRouteTree = route.children;
+          directoryFound = true;
+          return true;
+        }
         if (/\[\.\.\..*\]/g.test(route.route)) {
           const param = route.route
             .replace("[", "")
@@ -129,14 +142,7 @@ export function getUIFnAndRouteNameAndParams(
           directoryFound = true;
           return true;
         }
-        if (route.route === part) {
-          routeName += `/${part}`;
-
-          //
-          currentRouteTree = route.children;
-          directoryFound = true;
-          return true;
-        }
+        
       }
     }
 
@@ -146,7 +152,10 @@ export function getUIFnAndRouteNameAndParams(
     }
   });
 
-  const uiFn = currentRouteTree.find((r) => r.route === "ui");
+  const uiFn = currentRouteTree.find((r) => r.isDirectory === false);
+
+  // console.log(uiFn, currentRouteTree)
+
 
   if (notFound || !uiFn) {
     console.log("Route not found (" + pathname + ")");

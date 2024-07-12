@@ -7,30 +7,22 @@ import { LocalStorage } from "node-localstorage";
 const fs = require("fs");
 const path = require("path");
 
-
-
-
-export function getRoutesFromCustomRoutes(customRoutes: CustomRoutes[] = []): RouteTree[] { //todo: add custom routes type
+export function getRoutesFromCustomRoutes(
+  customRoutes: CustomRoutes[] = []
+): RouteTree[] {
+  //todo: add custom routes type
 
   const routeTree: RouteTree[] = [];
 
   customRoutes.forEach((customRoute) => {
-
     const split = removeFirstLastSlash(customRoute.route).split("/");
-
-    
-
-    
   });
 
   return routeTree;
 }
 function removeFirstLastSlash(s) {
-  return s.replace(/^\/|\/$/g, '');
+  return s.replace(/^\/|\/$/g, "");
 }
-
-
-
 
 export function getRoutesFromDirectory(directory: string): RouteTree[] {
   const rootDir = path.dirname(require.main.filename);
@@ -47,14 +39,8 @@ export function getRoutesFromDirectory(directory: string): RouteTree[] {
     throw new Error(`No files found in UI directory at ${uiDir}`);
   }
 
-  console.log(getFileTree(uiDir));
   return getFileTree(uiDir);
 }
-
-
-
-
-
 
 const ALLOWED_FILE_EXTENSIONS = [".js", ".ts"];
 const ALLOWED_FILE_NAMES = ["ui", "route"];
@@ -64,6 +50,7 @@ const EXCLUEDED_DIRECTORIES_REGEX = [/^_.*$/, /^\(.*$/];
 export const getFileTree = (dir, baseRoute = ""): RouteTree[] => {
   const result = [];
   const list = fs.readdirSync(dir);
+
 
   list.forEach((file) => {
     const filePath = path.join(dir, file);
@@ -92,16 +79,19 @@ export const getFileTree = (dir, baseRoute = ""): RouteTree[] => {
       ) {
         try {
           const module = require(filePath);
-          fileTreeNode.component = module.default || module || undefined;
+          fileTreeNode.component = module?.default || module || undefined;
 
           // remove any file extension from the route
           fileTreeNode.route = route.replace(fileExtension, "");
 
+
           if (
             fileTreeNode.component &&
             typeof fileTreeNode.component === "function"
-          )
+          ) {
             result.push(fileTreeNode);
+          }
+
         } catch (error) {}
       }
     }
@@ -109,8 +99,6 @@ export const getFileTree = (dir, baseRoute = ""): RouteTree[] => {
 
   return result;
 };
-
-
 
 const maxLength = 100;
 
