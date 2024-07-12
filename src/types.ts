@@ -20,13 +20,32 @@ export interface NavigatePropsProps {
   route: string;
   params: {
     [key: string]: string;
+  };
+  searchParams?: {
+    [key: string]: string;
   }
   globalMetadata: any;
   UIButtonBuilder: any;
 }
 
+export interface NavigateRouteProps {
+  navigate: (pathname: string) => void;
+  pathname: string;
+  route: string;
+  params: {
+    [key: string]: string;
+  };
+  searchParams?: {
+    [key: string]: string;
+  }
+  globalMetadata: any;
+}
+
 export interface NavigateOptions {
   blank?: boolean;
+  searchParams?: {
+    [key: string]: string;
+  };
 }
 
 export interface CustomRoutes {
@@ -40,7 +59,7 @@ export interface RouteTree {
   route: string;
   isDirectory: boolean;
   children: RouteTree[];
-  component?: (props: NavigatePropsProps) => void;
+  component?: (props: NavigatePropsProps | NavigateRouteProps) => void | string;
 }
 
 export interface UIMessage {

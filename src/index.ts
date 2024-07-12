@@ -142,15 +142,16 @@ function createUI(options: UIOptions) {
           // ui>f>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
           const button = buttonCache.get(functionId);
 
-          const { routeName, params } = getUIFnAndRouteNameAndParams(
+          const { routeName, params, searchParams, cleanPathname } = getUIFnAndRouteNameAndParams(
             button.currentPathname,
             routes
           );
 
           const props: NavigatePropsProps = {
-            pathname: button.currentPathname || null,
+            pathname: cleanPathname || null,
             route: routeName,
             params: params,
+            searchParams,
             interaction,
             navigate,
             UIButtonBuilder,
@@ -176,32 +177,7 @@ function createUI(options: UIOptions) {
       messageDefault
     );
 
-    const { UIButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
-
-    const { render, deferRender } = createUIRender(interaction);
-
-    const { uiFn, routeName, params } = getUIFnAndRouteNameAndParams(
-      pathname,
-      routes
-    );
-
-    const props: NavigatePropsProps = {
-      interaction,
-      navigate,
-      pathname,
-      params,
-      route: routeName,
-      UIButtonBuilder,
-      globalMetadata,
-      render,
-      deferRender,
-    };
-
-    if (uiFn) {
-      try {
-        uiFn?.component?.(props);
-      } catch (e) {}
-    }
+    navigate(pathname);
   }
 
   return { openUI, onInteraction };

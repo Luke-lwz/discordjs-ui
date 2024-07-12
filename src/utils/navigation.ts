@@ -1,6 +1,7 @@
 import {
   NavigateOptions,
   NavigatePropsProps,
+  NavigateRouteProps,
   RouteTree,
   UIMessageOptional,
 } from "../types";
@@ -24,26 +25,43 @@ export default function createNavigation(
       return;
     }
 
+    pathname = getNewPathNameWithSearchParams(pathname, options?.searchParams);
 
-    const { uiFn, routeName, params } = getUIFnAndRouteNameAndParams(pathname, routes);
+    const { uiFn, routeName, params, searchParams, cleanPathname } =
+      getUIFnAndRouteNameAndParams(pathname, routes);
 
     const { render, deferRender } = createUIRender(interaction);
 
-    
+    if (uiFn?.route === "ui") {
+      const props: NavigatePropsProps = {
+        interaction: interaction,
+        navigate,
+        pathname: cleanPathname || null,
+        route: routeName,
+        params,
+        searchParams,
+        globalMetadata,
+        UIButtonBuilder,
+        render,
+        deferRender,
+      };
+      uiFn?.component?.(props);
 
-    const props: NavigatePropsProps = {
-      interaction: interaction,
-      navigate,
-      pathname,
-      route: routeName,
-      params,
-      globalMetadata,
-      UIButtonBuilder,
-      render,
-      deferRender,
-    };
+      return;
+    }
 
-    if (uiFn) uiFn?.component?.(props);
+    if (uiFn?.route === "route") {
+      const props: NavigateRouteProps = {
+        navigate,
+        pathname: cleanPathname || null,
+        route: routeName,
+        params,
+        searchParams,
+        globalMetadata,
+      };
+      uiFn?.component?.(props);
+
+    }
   }
 
   return {
@@ -51,78 +69,118 @@ export default function createNavigation(
   };
 }
 
-
-
-
 interface GetUIFnAndRouteNameAndParamsReturns {
   uiFn?: RouteTree;
   routeName?: string;
   params?: any;
+  searchParams?: any;
+  cleanPathname?: string;
 }
 
-export function getUIFnAndRouteNameAndParams(pathname: string, routes: RouteTree[]): GetUIFnAndRouteNameAndParamsReturns | undefined{
+export function getUIFnAndRouteNameAndParams(
+  pathname: string,
+  routes: RouteTree[]
+): GetUIFnAndRouteNameAndParamsReturns | undefined {
   const params = {};
-    let routeName = "/";
+  let routeName = "/";
 
-    var currentRouteTree = routes;
+  const url = new URL("https://lol.lol" + decodeURI(pathname));
 
-    const pathnameSplit = pathname.split("/");
-    if (pathnameSplit[0] === "") pathnameSplit.shift();
+  pathname = url.pathname;
 
-    let notFound = false;
+  const searchParams = {};
 
-    pathnameSplit.forEach((part, index) => {
-      if (notFound) return;
-      let directoryFound = false;
-      for (let i = 0; i < currentRouteTree.length; i++) {
-        const route = currentRouteTree[i];
+  url.searchParams.forEach((value, key) => {
+    searchParams[key] = value;
+  });
 
-        if (route.isDirectory) {
-          if (/\[.*\]/g.test(route.route)) {
-            const param = route.route.replace("[", "").replace("]", "");
-            params[param] = part;
-            routeName += `/:${part}`;
+  var currentRouteTree = routes;
 
-            //
-            currentRouteTree = route.children;
-            directoryFound = true;
-            return true;
-          }
-          if (route.route === part) {
-            routeName += `/${part}`;
+  const pathnameSplit = pathname.split("/");
+  if (pathnameSplit[0] === "") pathnameSplit.shift();
 
-            //
-            currentRouteTree = route.children;
-            directoryFound = true;
-            return true;
-          }
+  let notFound = false;
+
+  pathnameSplit.forEach((part, index) => {
+    if (notFound) return;
+    let directoryFound = false;
+    for (let i = 0; i < currentRouteTree.length; i++) {
+      const route = currentRouteTree[i];
+
+      if (route.isDirectory) {
+        if (/\[\.\.\..*\]/g.test(route.route)) {
+          const param = route.route
+            .replace("[", "")
+            .replace(".", "")
+            .replace(".", "")
+            .replace(".", "")
+            .replace("]", "");
+          params[param] = pathnameSplit.slice(index).join("/");
+          routeName += `/:...${param}`;
+          i = currentRouteTree.length;
+        }
+        if (/\[.*\]/g.test(route.route)) {
+          const param = route.route.replace("[", "").replace("]", "");
+          params[param] = decodeURI(part);
+          routeName += `/:${part}`;
+
+          //
+          currentRouteTree = route.children;
+          directoryFound = true;
+          return true;
+        }
+        if (route.route === part) {
+          routeName += `/${part}`;
+
+          //
+          currentRouteTree = route.children;
+          directoryFound = true;
+          return true;
         }
       }
-
-      if (!directoryFound) {
-        notFound = true;
-        return;
-      }
-    });
-
-    const uiFn = currentRouteTree.find((r) => r.route === "ui");
-
-
-    if (notFound || !uiFn) {
-      console.log("Route not found (" + pathname + ")");
-
-      // 404 Embed 🚨
-
-      return {};
     }
 
-    // call function with this object
-
-    if (!(typeof uiFn.component === "function")) {
-      console.error("Component is not a function (" + pathname + ")");
-      return {};
+    if (!directoryFound) {
+      notFound = true;
+      return;
     }
+  });
 
+  const uiFn = currentRouteTree.find((r) => r.route === "ui");
 
-    return { uiFn, routeName, params };
+  if (notFound || !uiFn) {
+    console.log("Route not found (" + pathname + ")");
+
+    // 404 Embed 🚨
+
+    return {};
+  }
+
+  // call function with this object
+
+  if (!(typeof uiFn.component === "function")) {
+    console.error("Component is not a function (" + pathname + ")");
+    return {};
+  }
+
+  return {
+    uiFn,
+    routeName,
+    params,
+    searchParams,
+    cleanPathname: decodeURI(pathname),
+  };
+}
+
+export function getNewPathNameWithSearchParams(
+  pathname: string,
+  searchParams?: { [key: string]: string }
+) {
+  if (!searchParams) return pathname;
+
+  const url = new URL("https://lol.lol" + decodeURI(pathname));
+
+  url.search = new URLSearchParams(searchParams).toString();
+
+  return url.pathname + url.search;
 }

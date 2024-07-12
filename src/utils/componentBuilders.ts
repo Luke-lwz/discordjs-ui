@@ -1,11 +1,13 @@
 import { ButtonBuilder } from "discord.js";
 import {
   Button,
+  NavigateOptions,
   UIMessageCustomButton,
   UIMessageCustomSelectMenu,
 } from "../types";
 import { encodeRoute } from "./routes";
 import { ARGS_DIVIDER } from "./CONSTANTS";
+import { getNewPathNameWithSearchParams } from "./navigation";
 
 const ERROR_SUFFIX = " (UIButtonBuilder)";
 
@@ -67,8 +69,9 @@ export function getBuilders(prefix: string, buttonCache: any, currentPathname: s
       return this;
     }
 
-    navigateTo(route: string) {
-      this.button.navigateTo = route;
+    navigateTo(pathname: string, options?: NavigateOptions) {
+      pathname = getNewPathNameWithSearchParams(pathname, options?.searchParams);
+      this.button.navigateTo = encodeURI(pathname);
       return this;
     }
 
