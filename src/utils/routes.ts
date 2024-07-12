@@ -92,7 +92,9 @@ export const getFileTree = (dir, baseRoute = ""): RouteTree[] => {
             result.push(fileTreeNode);
           }
 
-        } catch (error) {}
+        } catch (error) {
+          throw new Error(`Error loading file ${filePath}: ${error.message}`);
+        }
       }
     }
   });

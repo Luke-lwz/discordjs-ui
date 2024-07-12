@@ -114,7 +114,6 @@ export function getUIFnAndRouteNameAndParams(
         if (route.route === part) {
           routeName += `/${part}`;
   
-      console.log(part, route.route, route.children?.length)
 
           //
           currentRouteTree = route.children;
@@ -154,7 +153,6 @@ export function getUIFnAndRouteNameAndParams(
 
   const uiFn = currentRouteTree.find((r) => r.isDirectory === false);
 
-  // console.log(uiFn, currentRouteTree)
 
 
   if (notFound || !uiFn) {
