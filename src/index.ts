@@ -102,7 +102,9 @@ function createUI(options: UIOptions) {
 
       const route = ""; // edit this 🚨🚨🚨🚨🚨🚨🚨
 
-      const { UIButtonBuilder } = getBuilders(prefix, buttonCache, route);
+      const { ButtonBuilder } = getBuilders(prefix, buttonCache, route);
+
+      console.log("ButtonBuilder", ButtonBuilder);
 
       const { render, deferRender } = createUIRender(interaction);
 
@@ -154,7 +156,7 @@ function createUI(options: UIOptions) {
             searchParams,
             interaction,
             navigate,
-            UIButtonBuilder,
+            ButtonBuilder,
             globalMetadata,
             render,
             deferRender,

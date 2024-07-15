@@ -25,7 +25,7 @@ export interface NavigatePropsProps {
     [key: string]: string;
   }
   globalMetadata: any;
-  UIButtonBuilder: any;
+  ButtonBuilder: any;
 }
 
 export interface NavigateRouteProps {

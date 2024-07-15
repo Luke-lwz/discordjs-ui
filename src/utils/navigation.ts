@@ -18,7 +18,7 @@ export default function createNavigation(
   buttonCache?: any
 ) {
   function navigate(pathname: string, options: NavigateOptions = {}) {
-    const { UIButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
+    const { ButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
 
     if (options.blank) {
       // open in new tab
@@ -41,7 +41,7 @@ export default function createNavigation(
         params,
         searchParams,
         globalMetadata,
-        UIButtonBuilder,
+        ButtonBuilder,
         render,
         deferRender,
       };
