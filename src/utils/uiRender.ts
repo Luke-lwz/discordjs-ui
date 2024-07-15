@@ -7,6 +7,9 @@ export interface UIRenderOptions {
 export function createUIRender(interaction: any) {
   async function render(msg: any, options: UIRenderOptions = { reply: false }) {
     // render UI
+
+    // add default message and then do a update not put (content : null, embeds: []) per default 🚨
+
     try {
       if (interaction?.deffered || interaction?.replied) {
         await interaction?.editReply?.(msg);

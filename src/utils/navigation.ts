@@ -100,7 +100,7 @@ export default function createNavigation(
         return;
       }
     } catch (e) {
-      console.error(e);
+      console.log(e.message);
       errorRoute?.component?.(defaultProps);
       return;
     }
@@ -258,7 +258,7 @@ export function getUIFnAndRouteNameAndParams(
 
   // call function with this object
 
-  if (!(typeof uiRoute.component === "function")) {
+  if (!(typeof uiRoute?.component === "function")) {
     console.error("Component is not a function (" + pathname + ")");
     notFound = true;
   }
