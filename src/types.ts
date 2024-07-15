@@ -41,6 +41,20 @@ export interface NavigateRouteProps {
   globalMetadata: any;
 }
 
+export interface NavigateCheckProps {
+  interaction: any,
+  pathname: string;
+  route: string;
+  params: {
+    [key: string]: string;
+  };
+  searchParams?: {
+    [key: string]: string;
+  }
+  globalMetadata: any;
+
+}
+
 export interface NavigateOptions {
   blank?: boolean;
   searchParams?: {
@@ -59,7 +73,7 @@ export interface RouteTree {
   route: string;
   isDirectory: boolean;
   children: RouteTree[];
-  component?: (props: NavigatePropsProps | NavigateRouteProps) => void | string;
+  component?: (props: NavigatePropsProps | NavigateRouteProps | any) => void | string;
 }
 
 export interface UIMessage {

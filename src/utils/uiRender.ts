@@ -25,6 +25,7 @@ export function createUIRender(interaction: any) {
 
   async function deferRender() {
     try {
+        if (interaction?.deffered || interaction?.replied) return;
         if (interaction?.message) {
             await interaction?.deferUpdate?.();
         } else {

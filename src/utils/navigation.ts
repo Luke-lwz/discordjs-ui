@@ -1,4 +1,8 @@
+import checkFailPage from "../default-pages/checkFail";
+import errorPage from "../default-pages/error";
+import notFoundPage from "../default-pages/notFound";
 import {
+  NavigateCheckProps,
   NavigateOptions,
   NavigatePropsProps,
   NavigateRouteProps,
@@ -17,7 +21,7 @@ export default function createNavigation(
   prefix: string = "ui",
   buttonCache?: any
 ) {
-  function navigate(pathname: string, options: NavigateOptions = {}) {
+  async function navigate(pathname: string, options: NavigateOptions = {}) {
     const { ButtonBuilder } = getBuilders(prefix, buttonCache, pathname);
 
     if (options.blank) {
@@ -27,40 +31,78 @@ export default function createNavigation(
 
     pathname = getNewPathNameWithSearchParams(pathname, options?.searchParams);
 
-    const { uiFn, routeName, params, searchParams, cleanPathname } =
-      getUIFnAndRouteNameAndParams(pathname, routes);
+    const {
+      uiRoute,
+      errorRoute,
+      checkFailRoute,
+      checkRoutes,
+      notFoundRoute,
+      loadingRoute,
+      routeName,
+      params,
+      searchParams,
+      cleanPathname,
+      notFound,
+    } = getUIFnAndRouteNameAndParams(pathname, routes);
 
     const { render, deferRender } = createUIRender(interaction);
 
-    if (uiFn?.route === "ui") {
-      const props: NavigatePropsProps = {
-        interaction: interaction,
-        navigate,
-        pathname: cleanPathname || null,
-        route: routeName,
-        params,
-        searchParams,
-        globalMetadata,
-        ButtonBuilder,
-        render,
-        deferRender,
-      };
-      uiFn?.component?.(props);
+    const defaultProps: NavigatePropsProps = {
+      interaction: interaction,
+      navigate,
+      pathname: cleanPathname || null,
+      route: routeName,
+      params,
+      searchParams,
+      globalMetadata,
+      ButtonBuilder,
+      render,
+      deferRender,
+    };
 
+    const checkProps: NavigateCheckProps = {
+      interaction,
+      pathname: cleanPathname,
+      route: routeName,
+      params,
+      searchParams,
+      globalMetadata,
+    };
+
+    try {
+
+      if (loadingRoute) {
+        loadingRoute?.component?.(defaultProps);
+      }
+
+      if (notFound) {
+        notFoundRoute?.component?.(defaultProps);
+        return;
+      }
+
+
+      // go thru checks
+      for (let i = 0; i < checkRoutes.length; i++) {
+        const checkRoute = checkRoutes[i];
+        if (!checkRoute.component) continue;
+        const checkResult = checkRoute.component(checkProps);
+        if (!checkResult) {
+          checkFailRoute?.component?.(defaultProps);
+          return;
+        }
+      }
+
+
+
+      if (uiRoute?.route === "ui") {
+        uiRoute?.component?.(defaultProps);
+
+        return;
+      }
+    } catch (e) {
+      console.error(e);
+      errorRoute?.component?.(defaultProps);
       return;
-    }
-
-    if (uiFn?.route === "route") {
-      const props: NavigateRouteProps = {
-        navigate,
-        pathname: cleanPathname || null,
-        route: routeName,
-        params,
-        searchParams,
-        globalMetadata,
-      };
-      uiFn?.component?.(props);
-
     }
   }
 
@@ -70,11 +112,17 @@ export default function createNavigation(
 }
 
 interface GetUIFnAndRouteNameAndParamsReturns {
-  uiFn?: RouteTree;
+  uiRoute?: RouteTree;
+  errorRoute?: RouteTree;
+  notFoundRoute?: RouteTree;
+  checkRoutes?: RouteTree[];
+  checkFailRoute?: RouteTree;
+  loadingRoute?: RouteTree;
   routeName?: string;
   params?: any;
   searchParams?: any;
   cleanPathname?: string;
+  notFound?: boolean;
 }
 
 export function getUIFnAndRouteNameAndParams(
@@ -101,80 +149,131 @@ export function getUIFnAndRouteNameAndParams(
 
   let notFound = false;
 
-  pathnameSplit.forEach((part, index) => {
-    if (notFound) return;
-    let directoryFound = false;
-    for (let i = 0; i < currentRouteTree.length; i++) {
-      const route = currentRouteTree[i];
+  let uiRoute: RouteTree = null;
 
+  let loadingRoute: RouteTree = null;
 
-      
+  let errorRoute: RouteTree = {
+    route: "error",
+    component: errorPage,
+    children: [],
+    isDirectory: false,
+  };
+  let notFoundRoute: RouteTree = {
+    route: "notFound",
+    component: notFoundPage,
+    children: [],
+    isDirectory: false,
+  };
 
-      if (route.isDirectory) {
-        if (route.route === part) {
-          routeName += `/${part}`;
-  
+  let checkRoutes: RouteTree[] = [];
+  let checkFailRoute: RouteTree = {
+    route: "checkFail",
+    component: checkFailPage,
+    children: [],
+    isDirectory: false,
+  };
 
-          //
-          currentRouteTree = route.children;
-          directoryFound = true;
-          return true;
-        }
-        if (/\[\.\.\..*\]/g.test(route.route)) {
-          const param = route.route
-            .replace("[", "")
-            .replace(".", "")
-            .replace(".", "")
-            .replace(".", "")
-            .replace("]", "");
-          params[param] = pathnameSplit.slice(index).join("/");
-          routeName += `/:...${param}`;
-          i = currentRouteTree.length;
-        }
-        if (/\[.*\]/g.test(route.route)) {
-          const param = route.route.replace("[", "").replace("]", "");
-          params[param] = decodeURI(part);
-          routeName += `/:${part}`;
-
-          //
-          currentRouteTree = route.children;
-          directoryFound = true;
-          return true;
-        }
-        
+  function searchForAndUpdatePageRoutes(currentRouteTree: RouteTree[]) {
+    currentRouteTree.forEach((route: RouteTree) => {
+      if (route.isDirectory) return;
+      if (route.route === "error") {
+        errorRoute = route;
+      } else if (route.route === "notFound") {
+        notFoundRoute = route;
+      } else if (route.route === "checkFail") {
+        checkFailRoute = route;
+      } else if (route.route === "check") {
+        checkRoutes.push(route);
+      } else if (route.route === "ui") {
+        uiRoute = route;
+      } else if (route.route === "loading") {
+        loadingRoute = route;
       }
-    }
+    });
+  }
 
-    if (!directoryFound) {
-      notFound = true;
-      return;
-    }
-  });
+  if (pathnameSplit.length === 0) {
+    searchForAndUpdatePageRoutes(currentRouteTree);
+  } else {
+    pathnameSplit.forEach((part, index) => {
+      if (notFound) return;
+      let directoryFound = false;
+      for (let i = 0; i < currentRouteTree.length; i++) {
+        const route = currentRouteTree[i];
 
-  const uiFn = currentRouteTree.find((r) => r.isDirectory === false);
+        if (route.isDirectory) {
+          if (route.route === part) {
+            routeName += `/${part}`;
 
+            //
+            currentRouteTree = route.children;
+            searchForAndUpdatePageRoutes(currentRouteTree);
 
+            directoryFound = true;
+            return true;
+          }
+          if (/\[\.\.\..*\]/g.test(route.route)) {
+            const param = route.route
+              .replace("[", "")
+              .replace(".", "")
+              .replace(".", "")
+              .replace(".", "")
+              .replace("]", "");
+            params[param] = pathnameSplit.slice(index).join("/");
+            routeName += `/:...${param}`;
+            searchForAndUpdatePageRoutes(route.children);
 
-  if (notFound || !uiFn) {
+            i = currentRouteTree.length;
+          }
+          if (/\[.*\]/g.test(route.route)) {
+            const param = route.route.replace("[", "").replace("]", "");
+            params[param] = decodeURI(part);
+            routeName += `/:${part}`;
+
+            //
+            currentRouteTree = route.children;
+            searchForAndUpdatePageRoutes(currentRouteTree);
+            directoryFound = true;
+            return true;
+          }
+        }
+      }
+
+      if (!directoryFound) {
+        notFound = true;
+        return;
+      }
+    });
+  }
+
+  if (notFound || !uiRoute) {
     console.log("Route not found (" + pathname + ")");
+
+    notFound = true;
 
     // 404 Embed 🚨
 
-    return {};
   }
 
   // call function with this object
 
-  if (!(typeof uiFn.component === "function")) {
+  if (!(typeof uiRoute.component === "function")) {
     console.error("Component is not a function (" + pathname + ")");
-    return {};
+    notFound = true;
   }
 
   return {
-    uiFn,
+    uiRoute,
+    errorRoute,
+    notFoundRoute,
+    checkRoutes,
+    checkFailRoute,
+    loadingRoute,
     routeName,
     params,
     searchParams,
+    notFound,
     cleanPathname: decodeURI(pathname),
   };
 }
