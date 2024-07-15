@@ -70,16 +70,16 @@ export default function createNavigation(
     };
 
     try {
-
       if (loadingRoute) {
-        loadingRoute?.component?.(defaultProps);
+        const loadingReturn = await loadingRoute?.component?.(defaultProps);
+        if (loadingReturn) render(loadingReturn);
       }
 
       if (notFound) {
-        notFoundRoute?.component?.(defaultProps);
+        const notFoundReturn = await notFoundRoute?.component?.(defaultProps);
+        if (notFoundReturn) render(notFoundReturn);
         return;
       }
-
 
       // go thru checks
       for (let i = 0; i < checkRoutes.length; i++) {
@@ -87,21 +87,23 @@ export default function createNavigation(
         if (!checkRoute.component) continue;
         const checkResult = checkRoute.component(checkProps);
         if (!checkResult) {
-          checkFailRoute?.component?.(defaultProps);
+          const checkFailReturn = await checkFailRoute?.component?.(
+            defaultProps
+          );
+          if (checkFailReturn) render(checkFailReturn);
           return;
         }
       }
 
-
-
       if (uiRoute?.route === "ui") {
-        uiRoute?.component?.(defaultProps);
-
+        const uiReturn = await uiRoute?.component?.(defaultProps);
+        if (uiReturn) render(uiReturn);
         return;
       }
     } catch (e) {
       console.log(e.message);
-      errorRoute?.component?.(defaultProps);
+      const errorReturn = await errorRoute?.component?.(defaultProps);
+      if (errorReturn) render(errorReturn);
       return;
     }
   }
@@ -193,59 +195,56 @@ export function getUIFnAndRouteNameAndParams(
     });
   }
 
-  if (pathnameSplit.length === 0) {
-    searchForAndUpdatePageRoutes(currentRouteTree);
-  } else {
-    pathnameSplit.forEach((part, index) => {
-      if (notFound) return;
-      let directoryFound = false;
-      for (let i = 0; i < currentRouteTree.length; i++) {
-        const route = currentRouteTree[i];
+  searchForAndUpdatePageRoutes(currentRouteTree);
+  pathnameSplit.forEach((part, index) => {
+    if (notFound) return;
+    let directoryFound = false;
+    for (let i = 0; i < currentRouteTree.length; i++) {
+      const route = currentRouteTree[i];
 
-        if (route.isDirectory) {
-          if (route.route === part) {
-            routeName += `/${part}`;
+      if (route.isDirectory) {
+        if (route.route === part) {
+          routeName += `/${part}`;
 
-            //
-            currentRouteTree = route.children;
-            searchForAndUpdatePageRoutes(currentRouteTree);
+          //
+          currentRouteTree = route.children;
+          searchForAndUpdatePageRoutes(currentRouteTree);
 
-            directoryFound = true;
-            return true;
-          }
-          if (/\[\.\.\..*\]/g.test(route.route)) {
-            const param = route.route
-              .replace("[", "")
-              .replace(".", "")
-              .replace(".", "")
-              .replace(".", "")
-              .replace("]", "");
-            params[param] = pathnameSplit.slice(index).join("/");
-            routeName += `/:...${param}`;
-            searchForAndUpdatePageRoutes(route.children);
+          directoryFound = true;
+          return true;
+        }
+        if (/\[\.\.\..*\]/g.test(route.route)) {
+          const param = route.route
+            .replace("[", "")
+            .replace(".", "")
+            .replace(".", "")
+            .replace(".", "")
+            .replace("]", "");
+          params[param] = pathnameSplit.slice(index).join("/");
+          routeName += `/:...${param}`;
+          searchForAndUpdatePageRoutes(route.children);
 
-            i = currentRouteTree.length;
-          }
-          if (/\[.*\]/g.test(route.route)) {
-            const param = route.route.replace("[", "").replace("]", "");
-            params[param] = decodeURI(part);
-            routeName += `/:${part}`;
+          i = currentRouteTree.length;
+        }
+        if (/\[.*\]/g.test(route.route)) {
+          const param = route.route.replace("[", "").replace("]", "");
+          params[param] = decodeURI(part);
+          routeName += `/:${part}`;
 
-            //
-            currentRouteTree = route.children;
-            searchForAndUpdatePageRoutes(currentRouteTree);
-            directoryFound = true;
-            return true;
-          }
+          //
+          currentRouteTree = route.children;
+          searchForAndUpdatePageRoutes(currentRouteTree);
+          directoryFound = true;
+          return true;
         }
       }
+    }
 
-      if (!directoryFound) {
-        notFound = true;
-        return;
-      }
-    });
-  }
+    if (!directoryFound) {
+      notFound = true;
+      return;
+    }
+  });
 
   if (notFound || !uiRoute) {
     console.log("Route not found (" + pathname + ")");
@@ -253,7 +252,6 @@ export function getUIFnAndRouteNameAndParams(
     notFound = true;
 
     // 404 Embed 🚨
-
   }
 
   // call function with this object
