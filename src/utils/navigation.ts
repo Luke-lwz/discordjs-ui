@@ -60,14 +60,6 @@ export default function createNavigation(
       deferRender,
     };
 
-    const checkProps: NavigateCheckProps = {
-      interaction,
-      pathname: cleanPathname,
-      route: routeName,
-      params,
-      searchParams,
-      globalMetadata,
-    };
 
     try {
       if (loadingRoute) {
@@ -85,7 +77,7 @@ export default function createNavigation(
       for (let i = 0; i < checkRoutes.length; i++) {
         const checkRoute = checkRoutes[i];
         if (!checkRoute.component) continue;
-        const checkResult = checkRoute.component(checkProps);
+        const checkResult = checkRoute.component(defaultProps);
         if (!checkResult) {
           const checkFailReturn = await checkFailRoute?.component?.(
             defaultProps
