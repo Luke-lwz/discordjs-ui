@@ -1,3 +1,5 @@
+
+
 export interface UIRenderOptions {
   reply: boolean;
 }
@@ -9,16 +11,15 @@ export function createUIRender(interaction: any) {
     // add default message and then do a update not put (content : null, embeds: []) per default 🚨
 
     try {
-      if (interaction?.deffered) {
+      if (interaction?.deffered || interaction?.replied) {
         await interaction?.editReply?.(msg);
-      } else if (interaction?.replied) {
-        await interaction?.update?.(msg);
       } else {
         if (interaction?.message) {
-          await interaction?.update?.(msg);
+            await interaction?.update?.(msg);
         } else {
-          await interaction?.reply?.(msg);
+            await interaction?.reply?.(msg);
         }
+            
       }
     } catch (e) {
       console.error(e);
@@ -27,16 +28,16 @@ export function createUIRender(interaction: any) {
 
   async function deferRender() {
     try {
-      if (interaction?.deffered || interaction?.replied) return;
-      if (interaction?.message) {
-        await interaction?.deferUpdate?.();
-      } else {
-        await interaction?.deferReply?.();
-      }
+        if (interaction?.deffered || interaction?.replied) return;
+        if (interaction?.message) {
+            await interaction?.deferUpdate?.();
+        } else {
+            await interaction?.deferReply?.();
+        }
     } catch (e) {
       console.error(e);
     }
   }
 
-  return { render, deferRender };
+  return {render, deferRender};
 }
