@@ -23,6 +23,7 @@ import deferRender from "./utils/render/deferRender";
 import ButtonBuilder from "./utils/builders/ButtonBuilder";
 import navigate from "./utils/router/navigate";
 import { runWithContext } from "./utils/context";
+import * as discordjs from "discord.js";
 
 export interface UIOptions {
   client: any;
@@ -180,10 +181,31 @@ function createUI(options: UIOptions) {
   return { openUI, onInteraction };
 }
 
-export {
-  createRegisterSlashCommandsFunction,
+
+const setupFunctions = {
   createUI,
+  createRegisterSlashCommandsFunction,
+};
+
+
+const routeFunctions = {
   render,
   deferRender,
+}
+
+const builders = {
   ButtonBuilder,
-};
+}
+
+
+const output = {
+  ...discordjs,
+  ...setupFunctions,
+  ...routeFunctions,
+  ...builders,
+
+}
+
+export default output;
+
+
