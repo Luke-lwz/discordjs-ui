@@ -113,7 +113,6 @@ function createUI(options: UIOptions) {
 
         const route = ""; // edit this 🚨🚨🚨🚨🚨🚨🚨
 
-        console.log("ButtonBuilder", ButtonBuilder);
 
         switch (type) {
           case "n": // navigate
