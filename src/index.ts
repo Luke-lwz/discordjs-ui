@@ -12,7 +12,7 @@ import {
   getRoutesFromCustomRoutes,
   getRoutesFromDirectory,
 } from "./utils/routes";
-import createNavigation, {
+import {
   getUIFnAndRouteNameAndParams,
 } from "./utils/navigation";
 import { getRouteFromUUID } from "./utils/routes";
@@ -172,11 +172,6 @@ function createUI(options: UIOptions) {
       prefix,
       buttonCache,
     }, async () => {
-      const { navigate } = createNavigation(
-        routes,
-        interaction,
-        globalMetadata
-      );
 
       await navigate(pathname);
     });

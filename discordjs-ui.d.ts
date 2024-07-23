@@ -27,4 +27,4 @@ declare function createUI(options: UIOptions): {
     openUI: (interaction: any, pathname: string) => Promise<void>
     onInteraction: (interaction: any) => void
 }
-export { createRegisterSlashCommandsFunction, createUI }
+export { createRegisterSlashCommandsFunction, createUI, render, deferRender, ButtonBuilder, }

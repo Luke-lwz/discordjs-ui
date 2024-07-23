@@ -1,4 +1,4 @@
-import { UIRenderOptions } from "./utils/uiRender";
+
 
 
 // slash commands
@@ -19,6 +19,10 @@ export interface ContextProps {
   prefix: string,
   buttonCache?: any
   currentPathname: string;
+}
+
+export interface UIRenderOptions {
+  reply: boolean;
 }
 
 

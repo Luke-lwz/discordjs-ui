@@ -10,6 +10,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
   const { routes, interaction, globalMetadata, prefix, buttonCache } =
     getContext();
 
+
   runWithContext(
     {
       routes,

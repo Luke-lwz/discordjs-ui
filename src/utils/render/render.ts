@@ -1,5 +1,5 @@
+import { UIRenderOptions } from "../../types";
 import { getContext } from "../context";
-import { UIRenderOptions } from "../uiRender";
 
 async function render(msg: any, options: UIRenderOptions = { reply: false }) {
   const { interaction } = getContext();
