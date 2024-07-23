@@ -197,7 +197,7 @@ const builders = {
 }
 
 
-const output = {
+const discordjsUI = {
   ...discordjs,
   ...setupFunctions,
   ...routeFunctions,
@@ -205,6 +205,6 @@ const output = {
 
 }
 
-export default output;
+export default discordjsUI;
 
 
