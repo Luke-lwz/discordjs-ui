@@ -1,6 +1,6 @@
 import { ButtonStyle, ActionRowBuilder, EmbedBuilder } from "discord.js";
 
-export default function checkFailPage({
+export default function gateErrorPage({
   interaction,
   ButtonBuilder,
   render,

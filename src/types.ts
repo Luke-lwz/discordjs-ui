@@ -1,4 +1,4 @@
-import { UIRenderOptions } from "./utils/uiRender";
+
 
 
 // slash commands
@@ -11,11 +11,23 @@ export interface SlashCommands {
 
 
 // Navigation
+
+export interface ContextProps {
+  routes: RouteTree[],
+  interaction: any,
+  globalMetadata: any,
+  prefix: string,
+  buttonCache?: any
+  currentPathname: string;
+}
+
+export interface UIRenderOptions {
+  reply: boolean;
+}
+
+
 export interface NavigatePropsProps {
   interaction: any;
-  navigate: (pathname: string) => void;
-  render: (msg: any, options: UIRenderOptions) => void;
-  deferRender: () => void;
   pathname: string;
   route: string;
   params: {
@@ -25,11 +37,9 @@ export interface NavigatePropsProps {
     [key: string]: string;
   }
   globalMetadata: any;
-  ButtonBuilder: any;
 }
 
 export interface NavigateRouteProps {
-  navigate: (pathname: string) => void;
   pathname: string;
   route: string;
   params: {

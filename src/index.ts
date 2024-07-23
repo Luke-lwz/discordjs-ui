@@ -12,14 +12,17 @@ import {
   getRoutesFromCustomRoutes,
   getRoutesFromDirectory,
 } from "./utils/routes";
-import createNavigation, {
+import {
   getUIFnAndRouteNameAndParams,
 } from "./utils/navigation";
 import { getRouteFromUUID } from "./utils/routes";
-import { getBuilders } from "./utils/componentBuilders";
 import { ARGS_DIVIDER, PREFIX_LENGTH } from "./utils/CONSTANTS";
 import { createRegisterSlashCommandsFunction } from "./utils/slashCommandFunction";
-import { createUIRender } from "./utils/uiRender";
+import render from "./utils/render/render";
+import deferRender from "./utils/render/deferRender";
+import ButtonBuilder from "./utils/builders/ButtonBuilder";
+import navigate from "./utils/router/navigate";
+import { runWithContext } from "./utils/context";
 
 export interface UIOptions {
   client: any;
@@ -83,106 +86,104 @@ function createUI(options: UIOptions) {
 
   // external functions (starter)
   function onInteraction(interaction: any) {
-    if (interaction?.isChatInputCommand()) {
-      // handle chat input
-      const { commandName } = interaction;
-      const slashCommand = slashCommands.find(
-        (sc) => sc?.command?.name === commandName
-      );
-      if (!slashCommand) return;
-      const { navigateTo } = slashCommand || {};
-      if (!navigateTo) return;
-      openUI(interaction, navigateTo);
-    } else if (interaction?.isButton()) {
-      const { customId = "" } = interaction || {};
-      if (!customId?.startsWith(prefix + ARGS_DIVIDER)) return;
-      const [_prefix, type, ...args] = customId.split(ARGS_DIVIDER);
+    runWithContext({
+      routes,
+      interaction,
+      globalMetadata,
+      prefix,
+      buttonCache,
+    }, async () => {
+      if (interaction?.isChatInputCommand()) {
+        // handle chat input
+        const { commandName } = interaction;
+        const slashCommand = slashCommands.find(
+          (sc) => sc?.command?.name === commandName
+        );
+        if (!slashCommand) return;
+        const { navigateTo } = slashCommand || {};
+        if (!navigateTo) return;
+        openUI(interaction, navigateTo);
+      } else if (interaction?.isButton()) {
+        const { customId = "" } = interaction || {};
+        if (!customId?.startsWith(prefix + ARGS_DIVIDER)) return;
+        const [_prefix, type, ...args] = customId.split(ARGS_DIVIDER);
 
-      if (_prefix !== prefix) return;
+        if (_prefix !== prefix) return;
 
-      const route = ""; // edit this 🚨🚨🚨🚨🚨🚨🚨
+        const route = ""; // edit this 🚨🚨🚨🚨🚨🚨🚨
 
-      const { ButtonBuilder } = getBuilders(prefix, buttonCache, route);
+        console.log("ButtonBuilder", ButtonBuilder);
 
-      console.log("ButtonBuilder", ButtonBuilder);
+        switch (type) {
+          case "n": // navigate
+            const [storeLocation, arg] = args;
+            switch (storeLocation) {
+              case "c": // cache
+                // ui>n>c>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
+                const id = arg;
+                const r = getRouteFromUUID(id);
+                if (!r) return;
 
-      const { render, deferRender } = createUIRender(interaction);
+                navigate(r);
+                break;
+              case "r": // route
+                // ui>n>r>/profile/123482938747191284 // happens when route is smaller than 100 characters
+                const route = arg;
+                navigate(route);
+                break;
+              default:
+                break;
+            }
+            break;
+          case "f": // function
+            if (!useFunctionalButtons) return;
+            const [functionId] = args;
+            // ui>f>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
+            const button = buttonCache.get(functionId);
 
-      const { navigate } = createNavigation(
-        routes,
-        interaction,
-        globalMetadata,
-        messageDefault,
-        prefix,
-        buttonCache
-      );
+            const { routeName, params, searchParams, cleanPathname } =
+              getUIFnAndRouteNameAndParams(button.currentPathname, routes);
 
-      switch (type) {
-        case "n": // navigate
-          const [storeLocation, arg] = args;
-          switch (storeLocation) {
-            case "c": // cache
-              // ui>n>c>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
-              const id = arg;
-              const r = getRouteFromUUID(id);
-              if (!r) return;
+            const props: NavigatePropsProps = {
+              pathname: cleanPathname || null,
+              route: routeName,
+              params: params,
+              searchParams,
+              interaction,
+              globalMetadata,
+            };
 
-              navigate(r);
-              break;
-            case "r": // route
-              // ui>n>r>/profile/123482938747191284 // happens when route is smaller than 100 characters
-              const route = arg;
-              navigate(route);
-              break;
-            default:
-              break;
-          }
-          break;
-        case "f": // function
-          if (!useFunctionalButtons) return;
-          const [functionId] = args;
-          // ui>f>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
-          const button = buttonCache.get(functionId);
-
-          const { routeName, params, searchParams, cleanPathname } = getUIFnAndRouteNameAndParams(
-            button.currentPathname,
-            routes
-          );
-
-          const props: NavigatePropsProps = {
-            pathname: cleanPathname || null,
-            route: routeName,
-            params: params,
-            searchParams,
-            interaction,
-            navigate,
-            ButtonBuilder,
-            globalMetadata,
-            render,
-            deferRender,
-          };
-
-          button?.fn?.(props);
-          break;
-        default:
-          break;
+            button?.fn?.(props);
+            break;
+          default:
+            break;
+        }
       }
-    }
+    });
   }
 
   async function openUI(interaction: any, pathname: string) {
     // open ui
-    const { navigate } = createNavigation(
+
+    runWithContext({
       routes,
       interaction,
       globalMetadata,
-      messageDefault
-    );
+      prefix,
+      buttonCache,
+    }, async () => {
 
-    navigate(pathname);
+      await navigate(pathname);
+    });
   }
 
   return { openUI, onInteraction };
 }
 
-export { createRegisterSlashCommandsFunction, createUI };
+export {
+  createRegisterSlashCommandsFunction,
+  createUI,
+  render,
+  deferRender,
+  ButtonBuilder,
+};
