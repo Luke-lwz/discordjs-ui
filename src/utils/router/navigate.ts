@@ -6,7 +6,7 @@ import {
 } from "../navigation";
 import render from "../render/render";
 
-async function navigate(pathname: string, options: NavigateOptions = {}) {
+async function navigate(pathname: string, options: NavigateOptions = {}) { // 🚨 make it so navigate cannot be used in a messageLayout.js file
   const { routes, interaction, globalMetadata, prefix, buttonCache } =
     getContext();
 
