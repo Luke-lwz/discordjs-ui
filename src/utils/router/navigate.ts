@@ -10,7 +10,6 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
   const { routes, interaction, globalMetadata, prefix, buttonCache } =
     getContext();
 
-
   runWithContext(
     {
       routes,
@@ -54,7 +53,6 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
       };
 
       try {
-
         if (notFound) {
           const notFoundReturn = await notFoundRoute?.component?.(defaultProps);
           if (notFoundReturn) render(notFoundReturn);
@@ -63,11 +61,10 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
 
         // go thru gates gates must return true to continue
         for (let i = 0; i < gateRoutes.length; i++) {
-          const checkRoute = gateRoutes[i];
-          if (!checkRoute.component) continue;
-          const checkResult = checkRoute.component(defaultProps);
-          if (!checkResult) {
-            
+          const gateRoute = gateRoutes[i];
+          if (!gateRoute.component) continue;
+          const gateReturn = await gateRoute.component(defaultProps);
+          if (!gateReturn) {
             return;
           }
         }
@@ -86,7 +83,5 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
     }
   );
 }
-
-
 
 export default navigate;
