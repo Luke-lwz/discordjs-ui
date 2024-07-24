@@ -190,6 +190,7 @@ const setupFunctions = {
 const routeFunctions = {
   render,
   deferRender,
+  navigate,
 }
 
 const builders = {

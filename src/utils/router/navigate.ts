@@ -37,7 +37,6 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
         gateErrorRoute,
         gateRoutes,
         notFoundRoute,
-        loadingRoute,
         routeName,
         params,
         searchParams,
@@ -55,10 +54,6 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
       };
 
       try {
-        if (loadingRoute) {
-          const loadingReturn = await loadingRoute?.component?.(defaultProps);
-          if (loadingReturn) render(loadingReturn);
-        }
 
         if (notFound) {
           const notFoundReturn = await notFoundRoute?.component?.(defaultProps);

@@ -20,7 +20,6 @@ interface GetUIFnAndRouteNameAndParamsReturns {
   notFoundRoute?: RouteTree;
   gateRoutes?: RouteTree[];
   gateErrorRoute?: RouteTree;
-  loadingRoute?: RouteTree;
   routeName?: string;
   params?: any;
   searchParams?: any;
@@ -53,8 +52,6 @@ export function getUIFnAndRouteNameAndParams(
   let notFound = false;
 
   let uiRoute: RouteTree = null;
-
-  let loadingRoute: RouteTree = null;
 
   let errorRoute: RouteTree = {
     route: "error",
@@ -90,8 +87,6 @@ export function getUIFnAndRouteNameAndParams(
         gateRoutes.push(route);
       } else if (route.route === "ui") {
         uiRoute = route;
-      } else if (route.route === "loading") {
-        loadingRoute = route;
       }
     });
   }
@@ -168,7 +163,6 @@ export function getUIFnAndRouteNameAndParams(
     notFoundRoute,
     gateRoutes,
     gateErrorRoute,
-    loadingRoute,
     routeName,
     params,
     searchParams,

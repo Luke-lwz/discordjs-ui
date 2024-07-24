@@ -31,10 +31,11 @@ declare function createUI(options: UIOptions): {
     openUI: (interaction: any, pathname: string) => Promise<void>
     onInteraction: (interaction: any) => void
 }
-declare const output: {
+declare const discordjsUI: {
     ButtonBuilder: typeof ButtonBuilder
     render: typeof render
     deferRender: typeof deferRender
+    navigate: typeof navigate
     createUI: typeof createUI
     createRegisterSlashCommandsFunction: typeof createRegisterSlashCommandsFunction
     basename(path: string, ext?: string): string
@@ -789,4 +790,4 @@ declare const output: {
     getInitialSendRateLimitState: typeof discordjs.getInitialSendRateLimitState
     managerToFetchingStrategyOptions: typeof discordjs.managerToFetchingStrategyOptions
 }
-export default output
+export default discordjsUI
