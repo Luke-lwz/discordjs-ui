@@ -19,7 +19,6 @@ export interface ContextProps {
   prefix: string,
   buttonCache?: any
   currentPathname: string;
-  isLoading: boolean;
 }
 
 export interface UIRenderOptions {

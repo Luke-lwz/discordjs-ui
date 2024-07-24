@@ -61,16 +61,13 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
           return;
         }
 
-        // go thru checks
+        // go thru gates gates must return true to continue
         for (let i = 0; i < gateRoutes.length; i++) {
           const checkRoute = gateRoutes[i];
           if (!checkRoute.component) continue;
           const checkResult = checkRoute.component(defaultProps);
           if (!checkResult) {
-            const gateErrorReturn = await gateErrorRoute?.component?.(
-              defaultProps
-            );
-            if (gateErrorReturn) render(gateErrorReturn);
+            
             return;
           }
         }
