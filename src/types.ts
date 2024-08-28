@@ -37,6 +37,9 @@ export interface NavigatePropsProps {
     [key: string]: string;
   }
   globalMetadata: any;
+  modal?: {
+    [key: string]: string;
+  }
 }
 
 export interface NavigateRouteProps {

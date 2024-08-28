@@ -33,6 +33,7 @@ declare function createUI(options: UIOptions): {
 }
 declare const discordjsUI: {
     ButtonBuilder: typeof ButtonBuilder
+    ModalBuilder: typeof ModalBuilder
     render: typeof render
     deferRender: typeof deferRender
     navigate: typeof navigate
@@ -110,7 +111,6 @@ declare const discordjsUI: {
     MentionableSelectMenuBuilder: typeof discordjs.MentionableSelectMenuBuilder
     ChannelSelectMenuBuilder: typeof discordjs.ChannelSelectMenuBuilder
     StringSelectMenuOptionBuilder: typeof discordjs.StringSelectMenuOptionBuilder
-    ModalBuilder: typeof discordjs.ModalBuilder
     TextInputBuilder: typeof discordjs.TextInputBuilder
     TextInputComponent: typeof discordjs.TextInputComponent
     BaseSelectMenuComponent: typeof discordjs.BaseSelectMenuComponent

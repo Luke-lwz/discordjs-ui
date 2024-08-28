@@ -43,6 +43,15 @@ async function navigate(pathname: string, options: NavigateOptions = {}) { // ðŸ
         notFound,
       } = getUIFnAndRouteNameAndParams(pathname, routes);
 
+      let modal = null;
+      if (interaction?.fields?.fields) {
+        modal = {};
+        const keys = interaction.fields.fields.keys();
+        for (const key of keys) {
+          modal[key] = interaction.fields.fields.get(key)?.value || null;
+        }
+      }
+
       const defaultProps: NavigatePropsProps = {
         interaction: interaction,
         pathname: cleanPathname || null,
@@ -50,6 +59,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) { // ðŸ
         params,
         searchParams,
         globalMetadata,
+        modal,
       };
 
       try {

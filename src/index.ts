@@ -12,9 +12,7 @@ import {
   getRoutesFromCustomRoutes,
   getRoutesFromDirectory,
 } from "./utils/routes";
-import {
-  getUIFnAndRouteNameAndParams,
-} from "./utils/navigation";
+import { getUIFnAndRouteNameAndParams } from "./utils/navigation";
 import { getRouteFromUUID } from "./utils/routes";
 import { ARGS_DIVIDER, PREFIX_LENGTH } from "./utils/CONSTANTS";
 import { createRegisterSlashCommandsFunction } from "./utils/slashCommandFunction";
@@ -24,6 +22,7 @@ import ButtonBuilder from "./utils/builders/ButtonBuilder";
 import navigate from "./utils/router/navigate";
 import { runWithContext } from "./utils/context";
 import * as discordjs from "discord.js";
+import ModalBuilder from "./utils/builders/ModalBuilder";
 
 export interface UIOptions {
   client: any;
@@ -87,125 +86,134 @@ function createUI(options: UIOptions) {
 
   // external functions (starter)
   function onInteraction(interaction: any) {
-    runWithContext({
-      routes,
-      interaction,
-      globalMetadata,
-      prefix,
-      buttonCache,
-    }, async () => {
-      if (interaction?.isChatInputCommand()) {
-        // handle chat input
-        const { commandName } = interaction;
-        const slashCommand = slashCommands.find(
-          (sc) => sc?.command?.name === commandName
-        );
-        if (!slashCommand) return;
-        const { navigateTo } = slashCommand || {};
-        if (!navigateTo) return;
-        openUI(interaction, navigateTo);
-      } else if (interaction?.isButton()) {
-        const { customId = "" } = interaction || {};
-        if (!customId?.startsWith(prefix + ARGS_DIVIDER)) return;
-        const [_prefix, type, ...args] = customId.split(ARGS_DIVIDER);
+    runWithContext(
+      {
+        routes,
+        interaction,
+        globalMetadata,
+        prefix,
+        buttonCache,
+      },
+      async () => {
+        if (interaction?.isChatInputCommand()) {
+          // handle chat input
+          const { commandName } = interaction;
+          const slashCommand = slashCommands.find(
+            (sc) => sc?.command?.name === commandName
+          );
+          if (!slashCommand) return;
+          const { navigateTo } = slashCommand || {};
+          if (!navigateTo) return;
+          openUI(interaction, navigateTo);
+        } else if (interaction?.isButton() || interaction?.isModalSubmit()) {
+          const { customId = "" } = interaction || {};
+          if (!customId?.startsWith(prefix + ARGS_DIVIDER)) return;
+          const [_prefix, type, ...args] = customId.split(ARGS_DIVIDER);
 
-        if (_prefix !== prefix) return;
+          if (_prefix !== prefix) return;
 
-        const route = ""; // edit this 🚨🚨🚨🚨🚨🚨🚨
+          const route = ""; // edit this 🚨🚨🚨🚨🚨🚨🚨
 
-
-        switch (type) {
-          case "n": // navigate
-            const [storeLocation, arg] = args;
-            switch (storeLocation) {
-              case "c": // cache
-                // ui>n>c>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
-                const id = arg;
-                const r = getRouteFromUUID(id);
-                if (!r) return;
-
-                navigate(r);
-                break;
-              case "r": // route
-                // ui>n>r>/profile/123482938747191284 // happens when route is smaller than 100 characters
-                const route = arg;
-                navigate(route);
-                break;
-              default:
-                break;
+          let modal = null;
+          if (interaction?.fields?.fields) {
+            modal = {};
+            const keys = interaction.fields.fields.keys();
+            for (const key of keys) {
+              modal[key] = interaction.fields.fields.get(key)?.value || null;
             }
-            break;
-          case "f": // function
-            if (!useFunctionalButtons) return;
-            const [functionId] = args;
-            // ui>f>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
-            const button = buttonCache.get(functionId);
+          }
 
-            const { routeName, params, searchParams, cleanPathname } =
-              getUIFnAndRouteNameAndParams(button.currentPathname, routes);
+          switch (type) {
+            case "n": // navigate
+              const [storeLocation, arg] = args;
+              switch (storeLocation) {
+                case "c": // cache
+                  // ui>n>c>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
+                  const id = arg;
+                  const r = getRouteFromUUID(id);
+                  if (!r) return;
 
-            const props: NavigatePropsProps = {
-              pathname: cleanPathname || null,
-              route: routeName,
-              params: params,
-              searchParams,
-              interaction,
-              globalMetadata,
-            };
+                  navigate(r);
+                  break;
+                case "r": // route
+                  // ui>n>r>/profile/123482938747191284 // happens when route is smaller than 100 characters
+                  const route = arg;
+                  navigate(route);
+                  break;
+                default:
+                  break;
+              }
+              break;
+            case "f": // function
+              if (!useFunctionalButtons) return;
+              const [functionId] = args;
+              // ui>f>1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed
+              const button = buttonCache.get(functionId);
 
-            button?.fn?.(props);
-            break;
-          default:
-            break;
+              const { routeName, params, searchParams, cleanPathname } =
+                getUIFnAndRouteNameAndParams(button.currentPathname, routes);
+
+              const props: NavigatePropsProps = {
+                pathname: cleanPathname || null,
+                route: routeName,
+                params: params,
+                searchParams,
+                interaction,
+                globalMetadata,
+                modal,
+              };
+
+              button?.fn?.(props);
+              break;
+            default:
+              break;
+          }
         }
       }
-    });
+    );
   }
 
   async function openUI(interaction: any, pathname: string) {
     // open ui
 
-    runWithContext({
-      routes,
-      interaction,
-      globalMetadata,
-      prefix,
-      buttonCache,
-    }, async () => {
-
-      await navigate(pathname);
-    });
+    runWithContext(
+      {
+        routes,
+        interaction,
+        globalMetadata,
+        prefix,
+        buttonCache,
+      },
+      async () => {
+        await navigate(pathname);
+      }
+    );
   }
 
   return { openUI, onInteraction };
 }
-
 
 const setupFunctions = {
   createUI,
   createRegisterSlashCommandsFunction,
 };
 
-
 const routeFunctions = {
   render,
   deferRender,
   navigate,
-}
+};
 
 const builders = {
   ButtonBuilder,
-}
-
+  ModalBuilder,
+};
 
 const discordjsUI = {
   ...discordjs,
   ...setupFunctions,
   ...routeFunctions,
   ...builders,
-
-}
+};
 
 export default discordjsUI;
-
-
