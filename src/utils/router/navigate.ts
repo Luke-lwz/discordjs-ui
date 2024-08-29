@@ -36,6 +36,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
       if (messageLayoutReturn) {
         context.messageLayout = mergeLayout(context.messageLayout, messageLayoutReturn);
       }
+      console.log("context.messageLayout", context.messageLayout);
     }, "messageLayout");
   }
 
