@@ -43,7 +43,7 @@ export type BuildersType = {
     ButtonBuilder: typeof ButtonBuilder
     ModalBuilder: typeof ModalBuilder
 }
-type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & BuildersType & typeof Types
+type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & BuildersType
 export type { DiscordjsUI }
 declare const discordjsUI: DiscordjsUI
 export default discordjsUI
