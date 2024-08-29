@@ -23,6 +23,7 @@ import navigate from "./utils/router/navigate";
 import { runWithContext } from "./utils/context";
 import * as discordjs from "discord.js";
 import ModalBuilder from "./utils/builders/ModalBuilder";
+import reply from "./utils/render/reply";
 
 export interface UIOptions {
   client: any;
@@ -225,6 +226,7 @@ const setupFunctions = {
 
 const routeFunctions = {
   render,
+  reply,
   deferRender,
   navigate,
 };
