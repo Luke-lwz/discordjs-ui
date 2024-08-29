@@ -10,8 +10,6 @@ import {
   UIMessageOptional,
 } from "../types";
 
-import { runWithContext } from "./context";
-import render from "./render/render";
 
 
 interface GetUIFnAndRouteNameAndParamsReturns {
@@ -19,7 +17,7 @@ interface GetUIFnAndRouteNameAndParamsReturns {
   errorRoute?: RouteTree;
   notFoundRoute?: RouteTree;
   gateRoutes?: RouteTree[];
-  gateErrorRoute?: RouteTree;
+  messageLayoutRoutes?: RouteTree[];
   routeName?: string;
   params?: any;
   searchParams?: any;
@@ -67,12 +65,8 @@ export function getUIFnAndRouteNameAndParams(
   };
 
   let gateRoutes: RouteTree[] = [];
-  let gateErrorRoute: RouteTree = {
-    route: "gateError",
-    component: gateErrorPage,
-    children: [],
-    isDirectory: false,
-  };
+
+  let messageLayoutRoutes: RouteTree[] = [];
 
   function searchForAndUpdatePageRoutes(currentRouteTree: RouteTree[]) {
     currentRouteTree.forEach((route: RouteTree) => {
@@ -81,10 +75,10 @@ export function getUIFnAndRouteNameAndParams(
         errorRoute = route;
       } else if (route.route === "notFound") {
         notFoundRoute = route;
-      } else if (route.route === "gateError") {
-        gateErrorRoute = route;
       } else if (route.route === "gate") {
         gateRoutes.push(route);
+      } else if (route.route === "messageLayout") {
+        messageLayoutRoutes.push(route);
       } else if (route.route === "ui") {
         uiRoute = route;
       }
@@ -162,7 +156,7 @@ export function getUIFnAndRouteNameAndParams(
     errorRoute,
     notFoundRoute,
     gateRoutes,
-    gateErrorRoute,
+    messageLayoutRoutes,
     routeName,
     params,
     searchParams,

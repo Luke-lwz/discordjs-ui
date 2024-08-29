@@ -43,7 +43,8 @@ export function getRoutesFromDirectory(directory: string): RouteTree[] {
 }
 
 const ALLOWED_FILE_EXTENSIONS = [".js", ".ts"];
-const ALLOWED_FILE_NAMES = ["ui", "error", "notFound", "gate"];
+export const ALLOWED_FILE_NAMES = ["ui", "error", "notFound", "gate", "messageLayout"];
+export type AllowedFileName = typeof ALLOWED_FILE_NAMES[number];
 
 const EXCLUEDED_DIRECTORIES_REGEX = [/^_.*$/, /^\(.*$/];
 

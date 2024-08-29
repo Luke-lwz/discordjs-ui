@@ -1,8 +1,17 @@
 import { UIRenderOptions } from "../../types";
 import { getContext } from "../context";
+import { filesDisallowedToUseRender } from "./constraints";
+
+
 
 async function render(msg: any) {
-  const { interaction } = getContext();
+  const { interaction, fileName } = getContext();
+
+  if (filesDisallowedToUseRender.includes(fileName)) {
+    throw new Error(
+      `You are not allowed to use render(); in ${fileName}.`
+    );
+  }
 
   // render UI
 

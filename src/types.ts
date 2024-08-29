@@ -1,3 +1,4 @@
+import { AllowedFileName } from "./utils/routes";
 
 
 
@@ -19,6 +20,8 @@ export interface ContextProps {
   prefix: string,
   buttonCache?: any
   currentPathname: string;
+  messageLayout?: any
+  fileName?: AllowedFileName; // this is the file names that the context is being used in
 }
 
 export interface UIRenderOptions {

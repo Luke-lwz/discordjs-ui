@@ -1,9 +1,10 @@
 // -- Usage definitions --
 
-// exporat all types in project
+// export all types in project
 // export * from "./types";
 // export * from "./utils/buttonCache";
 // export * from "./utils/navigation";
+// export * from "./index"
 
 // -- Driver definitions --
 
@@ -28,20 +29,21 @@ declare function createUI(options: UIOptions): {
     openUI: (interaction: any, pathname: string) => Promise<void>
     onInteraction: (interaction: any) => void
 }
-type SetupFunctionsType = {
+export type SetupFunctionsType = {
     createUI: typeof createUI
     createRegisterSlashCommandsFunction: typeof createRegisterSlashCommandsFunction
 }
-type RouteFunctionsType = {
+export type RouteFunctionsType = {
     render: typeof render
+    reply: typeof reply
     deferRender: typeof deferRender
     navigate: typeof navigate
 }
-type BuildersType = {
+export type BuildersType = {
     ButtonBuilder: typeof ButtonBuilder
     ModalBuilder: typeof ModalBuilder
 }
-type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & BuildersType
+type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & BuildersType & typeof Types
 export type { DiscordjsUI }
 declare const discordjsUI: DiscordjsUI
 export default discordjsUI

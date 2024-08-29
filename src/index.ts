@@ -94,6 +94,7 @@ function createUI(options: UIOptions) {
         globalMetadata,
         prefix,
         buttonCache,
+        messageLayout: {}
       },
       async () => {
         if (interaction?.isChatInputCommand()) {
@@ -184,6 +185,7 @@ function createUI(options: UIOptions) {
         globalMetadata,
         prefix,
         buttonCache,
+        messageLayout: {}
       },
       async () => {
         await navigate(pathname);
@@ -197,18 +199,19 @@ function createUI(options: UIOptions) {
 
 
 
-type SetupFunctionsType = {
+export type SetupFunctionsType = {
   createUI: typeof createUI;
   createRegisterSlashCommandsFunction: typeof createRegisterSlashCommandsFunction;
 };
 
-type RouteFunctionsType = {
+export type RouteFunctionsType = {
   render: typeof render;
+  reply: typeof reply;
   deferRender: typeof deferRender;
   navigate: typeof navigate;
 };
 
-type BuildersType = {
+export type BuildersType = {
   ButtonBuilder: typeof ButtonBuilder;
   ModalBuilder: typeof ModalBuilder;
 };
@@ -219,19 +222,19 @@ type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & 
 // Export the combined type
 export type { DiscordjsUI };
 
-const setupFunctions = {
+const setupFunctions: SetupFunctionsType = {
   createUI,
   createRegisterSlashCommandsFunction,
 };
 
-const routeFunctions = {
+const routeFunctions: RouteFunctionsType = {
   render,
   reply,
   deferRender,
   navigate,
 };
 
-const builders = {
+const builders: BuildersType = {
   ButtonBuilder,
   ModalBuilder,
 };

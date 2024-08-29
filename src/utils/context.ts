@@ -2,7 +2,7 @@
 import { AsyncResource, createHook, executionAsyncId } from "async_hooks";
 import { ContextProps } from "../types";
 
-type ContextType = ContextProps;
+export type ContextType = ContextProps;
 
 const contexts = new Map<number, ContextType>();
 
