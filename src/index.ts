@@ -193,6 +193,31 @@ function createUI(options: UIOptions) {
   return { openUI, onInteraction };
 }
 
+
+
+
+type SetupFunctionsType = {
+  createUI: typeof createUI;
+  createRegisterSlashCommandsFunction: typeof createRegisterSlashCommandsFunction;
+};
+
+type RouteFunctionsType = {
+  render: typeof render;
+  deferRender: typeof deferRender;
+  navigate: typeof navigate;
+};
+
+type BuildersType = {
+  ButtonBuilder: typeof ButtonBuilder;
+  ModalBuilder: typeof ModalBuilder;
+};
+
+// Combine all types into a single type
+type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & BuildersType;
+
+// Export the combined type
+export type { DiscordjsUI };
+
 const setupFunctions = {
   createUI,
   createRegisterSlashCommandsFunction,
@@ -209,7 +234,7 @@ const builders = {
   ModalBuilder,
 };
 
-const discordjsUI = {
+const discordjsUI: DiscordjsUI = {
   ...discordjs,
   ...setupFunctions,
   ...routeFunctions,
