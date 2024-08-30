@@ -10,11 +10,8 @@ async function render(msg: any) {
     throw new Error(`You are not allowed to use render(); in ${fileName}.`);
   }
 
-  console.log("msg1", msg, messageLayout);
 
   msg = mergeLayout(messageLayout, msg);
-
-  console.log("msg2", msg, messageLayout);
 
   // render UI
 

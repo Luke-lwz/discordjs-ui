@@ -10,7 +10,6 @@ export function mergeLayout(baseLayout: any = {}, merge: any) {
     }
 
     for (const key in merge) {
-            console.log(merge[key])
             outObj[key] = merge[key];
     }
 

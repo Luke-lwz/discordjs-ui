@@ -31,12 +31,11 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
   for (let i = 0; i < messageLayoutRoutes.length; i++) {
     const messageLayoutRoute = messageLayoutRoutes[i];
     if (!messageLayoutRoute.component) continue;
-    contextWrapper(context, pathname, options, async (props) => {
+    await contextWrapper(context, pathname, options, async (props) => {
       const messageLayoutReturn = await messageLayoutRoute?.component(props);
       if (messageLayoutReturn) {
         context.messageLayout = mergeLayout(context.messageLayout, messageLayoutReturn);
       }
-      console.log("context.messageLayout", context.messageLayout);
     }, "messageLayout");
   }
 
@@ -75,7 +74,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
   }, "ui");
 }
 
-function contextWrapper(
+async function contextWrapper(
   context: ContextType,
   pathname: string,
   options: NavigateOptions = {},
@@ -87,7 +86,7 @@ function contextWrapper(
   const { routeName, params, searchParams, cleanPathname, errorRoute } =
     getUIFnAndRouteNameAndParams(pathname, routes);
 
-  runWithContext(
+  await runWithContext(
     {
       ...context,
       fileName,
@@ -120,8 +119,7 @@ function contextWrapper(
 
       try {
         await callback(defaultProps);
-      } catch (e: any) {
-        console.log(e.message);
+      } catch (e: any) { 
         const errorReturn = await errorRoute?.component?.(defaultProps);
         if (errorReturn) reply(errorReturn);
         return;
