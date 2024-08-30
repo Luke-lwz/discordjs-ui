@@ -18,6 +18,7 @@ interface GetUIFnAndRouteNameAndParamsReturns {
   notFoundRoute?: RouteTree;
   gateRoutes?: RouteTree[];
   messageLayoutRoutes?: RouteTree[];
+  contextRoutes?: RouteTree[];
   routeName?: string;
   params?: any;
   searchParams?: any;
@@ -68,6 +69,8 @@ export function getUIFnAndRouteNameAndParams(
 
   let messageLayoutRoutes: RouteTree[] = [];
 
+  let contextRoutes: RouteTree[] = [];
+
   function searchForAndUpdatePageRoutes(currentRouteTree: RouteTree[]) {
     currentRouteTree.forEach((route: RouteTree) => {
       if (route.isDirectory) return;
@@ -79,6 +82,8 @@ export function getUIFnAndRouteNameAndParams(
         gateRoutes.push(route);
       } else if (route.route === "messageLayout") {
         messageLayoutRoutes.push(route);
+      } else if (route.route === "context") {
+        contextRoutes.push(route);
       } else if (route.route === "ui") {
         uiRoute = route;
       }
@@ -157,6 +162,7 @@ export function getUIFnAndRouteNameAndParams(
     notFoundRoute,
     gateRoutes,
     messageLayoutRoutes,
+    contextRoutes,
     routeName,
     params,
     searchParams,

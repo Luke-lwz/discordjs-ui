@@ -20,7 +20,8 @@ export interface ContextProps {
   prefix: string,
   buttonCache?: any
   currentPathname: string;
-  messageLayout?: any
+  messageLayout?: any;
+  context?: any;
   fileName?: AllowedFileName; // this is the file names that the context is being used in
 }
 
@@ -40,6 +41,7 @@ export interface NavigatePropsProps {
     [key: string]: string;
   }
   globalMetadata: any;
+  context:{};
   modal?: {
     [key: string]: string;
   }

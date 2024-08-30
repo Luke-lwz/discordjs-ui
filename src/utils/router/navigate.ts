@@ -23,7 +23,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
     );
   }
 
-  const { uiRoute, gateRoutes, messageLayoutRoutes, notFoundRoute, notFound } =
+  const { uiRoute, gateRoutes, messageLayoutRoutes, notFoundRoute, notFound, contextRoutes } =
     getUIFnAndRouteNameAndParams(pathname, routes);
 
   context.messageLayout = {};
@@ -37,6 +37,19 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
         context.messageLayout = mergeLayout(context.messageLayout, messageLayoutReturn);
       }
     }, "messageLayout");
+  }
+
+  context.context = {};
+
+  for (let i = 0; i < contextRoutes.length; i++) {
+    const contextRoute = contextRoutes[i];
+    if (!contextRoute.component) continue;
+    await contextWrapper(context, pathname, options, async (props) => {
+      const contextReturn = await contextRoute?.component(props);
+      if (contextReturn) {
+        context.context = mergeLayout(context.context, contextReturn);
+      }
+    }, "context");
   }
 
   let allowedToContinue = true;
@@ -114,6 +127,7 @@ async function contextWrapper(
         params,
         searchParams,
         globalMetadata,
+        context: context.context || {},
         modal,
       };
 

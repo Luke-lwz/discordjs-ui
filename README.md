@@ -15,7 +15,8 @@ When message in messageLayout is set to ephemeral, then all messages sent from U
 previous layouts will be sent via context in parameter `messageLayout`  
 **Important**  
 Nested layouts **won't** completely overwrite each other, they combine. Only things you change, overwrite each other.  
-if you want to remove certain properties, set them to null (setting them to undefined will be the same as doing nothing)
+if you want to remove certain properties, set them to null (setting them to undefined will be the same as doing nothing)  
+`context.js`: Works like messageLayout.js also propagates down nested routes, contexts will also nest into each other 
 
 
 

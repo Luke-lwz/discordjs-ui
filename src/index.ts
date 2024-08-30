@@ -94,7 +94,8 @@ function createUI(options: UIOptions) {
         globalMetadata,
         prefix,
         buttonCache,
-        messageLayout: {}
+        messageLayout: {},
+        context: {},
       },
       async () => {
         if (interaction?.isChatInputCommand()) {
@@ -163,6 +164,7 @@ function createUI(options: UIOptions) {
                 interaction,
                 globalMetadata,
                 modal,
+                context: {}
               };
 
               button?.fn?.(props);
@@ -185,7 +187,8 @@ function createUI(options: UIOptions) {
         globalMetadata,
         prefix,
         buttonCache,
-        messageLayout: {}
+        messageLayout: {},
+        context: {},
       },
       async () => {
         await navigate(pathname);
