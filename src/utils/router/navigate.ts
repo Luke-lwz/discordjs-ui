@@ -41,7 +41,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
 
   let allowedToContinue = true;
 
-  contextWrapper(context, pathname, options, async (props) => {
+  await contextWrapper(context, pathname, options, async (props) => {
     if (notFound) {
       const notFoundReturn = await notFoundRoute?.component?.(props);
       if (notFoundReturn) render(notFoundReturn);
@@ -51,7 +51,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
 
   if (!allowedToContinue) return;
 
-  contextWrapper(context, pathname, options, async (props) => {
+  await contextWrapper(context, pathname, options, async (props) => {
     // go thru gates gates must return true to continue
     for (let i = 0; i < gateRoutes.length; i++) {
       const gateRoute = gateRoutes[i];
@@ -65,7 +65,7 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
 
   if (!allowedToContinue) return;
 
-  contextWrapper(context, pathname, options, async (props) => {
+  await contextWrapper(context, pathname, options, async (props) => {
     if (uiRoute?.route === "ui") {
       const uiReturn = await uiRoute?.component?.(props);
       if (uiReturn) render(uiReturn);
