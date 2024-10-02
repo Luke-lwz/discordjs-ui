@@ -24,6 +24,7 @@ import { runWithContext } from "./utils/context";
 import * as discordjs from "discord.js";
 import ModalBuilder from "./utils/builders/ModalBuilder";
 import reply from "./utils/render/reply";
+import { postChannelPrefab } from "./utils/channelPrefab";
 
 export interface UIOptions {
   client: any;
@@ -163,6 +164,7 @@ function createUI(options: UIOptions) {
                 searchParams,
                 interaction,
                 globalMetadata,
+
                 modal,
                 context: {}
               };
@@ -207,6 +209,10 @@ export type SetupFunctionsType = {
   createRegisterSlashCommandsFunction: typeof createRegisterSlashCommandsFunction;
 };
 
+export type UtilityFunctionsType = {
+  postChannelPrefab: typeof postChannelPrefab;
+};
+
 export type RouteFunctionsType = {
   render: typeof render;
   reply: typeof reply;
@@ -230,6 +236,10 @@ const setupFunctions: SetupFunctionsType = {
   createRegisterSlashCommandsFunction,
 };
 
+const utilityFunctions:  UtilityFunctionsType = {
+  postChannelPrefab,
+};
+
 const routeFunctions: RouteFunctionsType = {
   render,
   reply,
@@ -245,6 +255,7 @@ const builders: BuildersType = {
 const discordjsUI: DiscordjsUI = {
   ...discordjs,
   ...setupFunctions,
+  ...utilityFunctions,
   ...routeFunctions,
   ...builders,
 };
