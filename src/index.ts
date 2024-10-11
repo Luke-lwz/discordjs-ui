@@ -22,6 +22,7 @@ import ButtonBuilder from "./utils/builders/ButtonBuilder";
 import navigate from "./utils/router/navigate";
 import { runWithContext } from "./utils/context";
 import * as discordjs from "discord.js";
+
 import ModalBuilder from "./utils/builders/ModalBuilder";
 import reply from "./utils/render/reply";
 import { postChannelPrefab } from "./utils/channelPrefab";
@@ -226,7 +227,7 @@ export type BuildersType = {
 };
 
 // Combine all types into a single type
-type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & BuildersType;
+type DiscordjsUI = SetupFunctionsType & RouteFunctionsType & BuildersType;
 
 // Export the combined type
 export type { DiscordjsUI };
@@ -261,3 +262,6 @@ const discordjsUI: DiscordjsUI = {
 };
 
 export default discordjsUI;
+
+
+export type * from 'discord.js';

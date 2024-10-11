@@ -12,7 +12,6 @@
 
 // -- Entry point definition --
 
-import * as discordjs from "discord.js"
 export interface UIOptions {
     client: any
     slashCommands?: SlashCommands[]
@@ -33,6 +32,9 @@ export type SetupFunctionsType = {
     createUI: typeof createUI
     createRegisterSlashCommandsFunction: typeof createRegisterSlashCommandsFunction
 }
+export type UtilityFunctionsType = {
+    postChannelPrefab: typeof postChannelPrefab
+}
 export type RouteFunctionsType = {
     render: typeof render
     reply: typeof reply
@@ -43,7 +45,8 @@ export type BuildersType = {
     ButtonBuilder: typeof ButtonBuilder
     ModalBuilder: typeof ModalBuilder
 }
-type DiscordjsUI = typeof discordjs & SetupFunctionsType & RouteFunctionsType & BuildersType
+type DiscordjsUI = SetupFunctionsType & RouteFunctionsType & BuildersType
 export type { DiscordjsUI }
 declare const discordjsUI: DiscordjsUI
 export default discordjsUI
+export type * from 'discord.js'
