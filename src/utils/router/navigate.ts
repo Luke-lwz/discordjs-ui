@@ -134,8 +134,13 @@ async function contextWrapper(
       try {
         await callback(defaultProps);
       } catch (e: any) { 
-        const errorReturn = await errorRoute?.component?.(defaultProps);
-        if (errorReturn) reply(errorReturn);
+        console.log(e);
+        try {
+          const errorReturn = await errorRoute?.component?.(defaultProps);
+          if (errorReturn) reply(errorReturn);
+        } catch (e: any) {
+          console.log(e);
+        }
         return;
       }
     }
