@@ -14,7 +14,7 @@ async function reply(msg: any) {
 
   if (interaction?.replied) {
     await interaction?.followUp?.(msg);
-  } else {
+  } else if (interaction.deffered) {
     await interaction?.reply?.(msg);
   }
 }
