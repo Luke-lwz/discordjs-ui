@@ -27,7 +27,7 @@ export async function postChannelPrefab(prefab: ChannelPrefab) {
         outMessages.push(msg);
     }
   } catch (e) {
-    
+    console.log(e);
   }
 
   return { channel: outChannel, messages: outMessages };
