@@ -16,7 +16,8 @@ export async function postChannelPrefab(prefab: ChannelPrefab) {
   let outMessages = [];
 
   try {
-    const channel = await interaction.guild.channels.create(name, {
+    const channel = await interaction.guild.channels.create({
+      name,
       type,
       ...rest,
     });

@@ -18,25 +18,38 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
   const { routes, fileName } = context;
 
   if (filesDisallowedToUseNavigate.includes(fileName)) {
-    throw new Error(
-      `You are not allowed to use navigate(); in ${fileName}.`
-    );
+    throw new Error(`You are not allowed to use navigate(); in ${fileName}.`);
   }
 
-  const { uiRoute, gateRoutes, messageLayoutRoutes, notFoundRoute, notFound, contextRoutes } =
-    getUIFnAndRouteNameAndParams(pathname, routes);
+  const {
+    uiRoute,
+    gateRoutes,
+    messageLayoutRoutes,
+    notFoundRoute,
+    notFound,
+    contextRoutes,
+  } = getUIFnAndRouteNameAndParams(pathname, routes);
 
   context.messageLayout = {};
 
   for (let i = 0; i < messageLayoutRoutes.length; i++) {
     const messageLayoutRoute = messageLayoutRoutes[i];
     if (!messageLayoutRoute.component) continue;
-    await contextWrapper(context, pathname, options, async (props) => {
-      const messageLayoutReturn = await messageLayoutRoute?.component(props);
-      if (messageLayoutReturn) {
-        context.messageLayout = mergeLayout(context.messageLayout, messageLayoutReturn);
-      }
-    }, "messageLayout");
+    await contextWrapper(
+      context,
+      pathname,
+      options,
+      async (props) => {
+        const messageLayoutReturn = await messageLayoutRoute?.component(props);
+        if (messageLayoutReturn) {
+          context.messageLayout = mergeLayout(
+            context.messageLayout,
+            messageLayoutReturn
+          );
+        }
+      },
+      "messageLayout"
+    );
   }
 
   context.context = {};
@@ -44,47 +57,71 @@ async function navigate(pathname: string, options: NavigateOptions = {}) {
   for (let i = 0; i < contextRoutes.length; i++) {
     const contextRoute = contextRoutes[i];
     if (!contextRoute.component) continue;
-    await contextWrapper(context, pathname, options, async (props) => {
-      const contextReturn = await contextRoute?.component(props);
-      if (contextReturn) {
-        context.context = mergeLayout(context.context, contextReturn);
-      }
-    }, "context");
+    await contextWrapper(
+      context,
+      pathname,
+      options,
+      async (props) => {
+        const contextReturn = await contextRoute?.component(props);
+        if (contextReturn) {
+          context.context = mergeLayout(context.context, contextReturn);
+        }
+      },
+      "context"
+    );
   }
 
   let allowedToContinue = true;
 
-  await contextWrapper(context, pathname, options, async (props) => {
-    if (notFound) {
-      const notFoundReturn = await notFoundRoute?.component?.(props);
-      if (notFoundReturn) render(notFoundReturn);
-      return (allowedToContinue = false);
-    }
-  }, "notFound");
-
-  if (!allowedToContinue) return;
-
-  await contextWrapper(context, pathname, options, async (props) => {
-    // go thru gates gates must return true to continue
-    for (let i = 0; i < gateRoutes.length; i++) {
-      const gateRoute = gateRoutes[i];
-      if (!gateRoute.component) continue;
-      const gateReturn = await gateRoute.component(props);
-      if (!gateReturn) {
+  await contextWrapper(
+    context,
+    pathname,
+    options,
+    async (props) => {
+      if (notFound) {
+        const notFoundReturn = await notFoundRoute?.component?.(props);
+        if (notFoundReturn) render(notFoundReturn);
         return (allowedToContinue = false);
       }
-    }
-  }, "gate");
+    },
+    "notFound"
+  );
 
   if (!allowedToContinue) return;
 
-  await contextWrapper(context, pathname, options, async (props) => {
-    if (uiRoute?.route === "ui") {
-      const uiReturn = await uiRoute?.component?.(props);
-      if (uiReturn) render(uiReturn);
-      return;
-    }
-  }, "ui");
+  await contextWrapper(
+    context,
+    pathname,
+    options,
+    async (props) => {
+      // go thru gates gates must return true to continue
+      for (let i = 0; i < gateRoutes.length; i++) {
+        const gateRoute = gateRoutes[i];
+        if (!gateRoute.component) continue;
+        const gateReturn = await gateRoute.component(props);
+        if (!gateReturn) {
+          return (allowedToContinue = false);
+        }
+      }
+    },
+    "gate"
+  );
+
+  if (!allowedToContinue) return;
+
+  await contextWrapper(
+    context,
+    pathname,
+    options,
+    async (props) => {
+      if (uiRoute?.route === "ui") {
+        const uiReturn = await uiRoute?.component?.(props);
+        if (uiReturn) render(uiReturn);
+        return;
+      }
+    },
+    "ui"
+  );
 }
 
 async function contextWrapper(
@@ -92,7 +129,7 @@ async function contextWrapper(
   pathname: string,
   options: NavigateOptions = {},
   callback: (props: NavigatePropsProps) => void,
-  fileName:AllowedFileName
+  fileName: AllowedFileName
 ) {
   const { routes, interaction, globalMetadata } = context;
 
@@ -133,11 +170,20 @@ async function contextWrapper(
 
       try {
         await callback(defaultProps);
-      } catch (e: any) { 
+      } catch (e: any) {
         console.log(e);
         try {
-          const errorReturn = await errorRoute?.component?.(defaultProps);
-          if (errorReturn) reply(errorReturn);
+          await runWithContext(
+            {
+              ...context,
+              fileName: "error",
+              currentPathname: pathname,
+            },
+            async () => {
+              const errorReturn = await errorRoute?.component?.(defaultProps);
+              if (errorReturn) reply(errorReturn);
+            }
+          );
         } catch (e: any) {
           console.log(e);
         }
