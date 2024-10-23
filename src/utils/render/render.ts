@@ -17,19 +17,22 @@ async function render(msg: any) {
 
   // add default message and then do a update not put (content : null, embeds: []) per default 🚨
 
+  let outMessage = null;
   try {
     if (interaction?.deffered || interaction?.replied) {
-      await interaction?.editReply?.(msg);
+      outMessage = await interaction?.editReply?.(msg);
     } else {
       if (interaction?.message) {
-        await interaction?.update?.(msg);
+        outMessage = await interaction?.update?.(msg);
       } else {
-        await interaction?.reply?.(msg);
+        outMessage = await interaction?.reply?.(msg);
       }
     }
   } catch (e) {
     console.error(e);
   }
+
+  return outMessage;
 }
 
 export default render;

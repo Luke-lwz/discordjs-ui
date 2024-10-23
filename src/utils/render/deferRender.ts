@@ -12,16 +12,20 @@ async function deferRender(msg: any) {
   
     msg = mergeLayout(messageLayout, msg);
 
+    let outMessage = null;
+
   try {
     if (interaction?.deffered || interaction?.replied) return;
     if (interaction?.message) {
-      await interaction?.deferUpdate?.(msg);
+      outMessage = await interaction?.deferUpdate?.(msg);
     } else {
-      await interaction?.deferReply?.(msg);
+      outMessage = await interaction?.deferReply?.(msg);
     }
   } catch (e) {
     console.error(e);
   }
+
+  return outMessage;
 }
 
 export default deferRender;
