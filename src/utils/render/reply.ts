@@ -12,11 +12,20 @@ async function reply(msg: any) {
 
   msg = mergeLayout(messageLayout, msg);
 
-  if (interaction?.replied) {
-    await interaction?.followUp?.(msg);
-  } else {
-    await interaction?.reply?.(msg);
+  try {
+    if (interaction?.replied) {
+      await interaction?.followUp?.(msg);
+    } else {
+      await interaction?.reply?.(msg);
+    }
   }
+  catch (err) {
+    console.error(err);
+  }
+
+  // add return 🚨🚨🚨🚨🚨🚨🚨🚨🚨
+
+  
 }
 
 export default reply;
