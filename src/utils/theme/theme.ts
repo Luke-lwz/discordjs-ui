@@ -3,7 +3,7 @@ import { getContext } from "../context";
 import { DefaultTheme } from "./defaultTheme";
 
 export default function getTheme(): Theme {
-  const { theme: contextTheme } = getContext(true);
+  const { theme: contextTheme } = getContext(true) || {};
 
   const themeInput = contextTheme || DefaultTheme;
 
