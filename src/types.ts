@@ -23,6 +23,7 @@ export interface ContextProps {
   messageLayout?: any;
   context?: any;
   fileName?: AllowedFileName; // this is the file names that the context is being used in
+  theme: ThemeInput;
 }
 
 export interface UIRenderOptions {
@@ -212,4 +213,36 @@ export interface MessageResponse {
   ephemeral?: boolean;
   embeds?: Embed[];
   components?: ComponentRow[];
+}
+
+
+
+
+// theme
+
+
+export interface ThemeInput  {
+  primary: string;
+  danger: string;
+  success: string;
+  warning: string;
+  info: string;
+}
+
+export interface Theme extends ThemeInput {
+  white: string;
+  black: string;
+  ghost: string;
+  primaryLight: string;
+  primaryDark: string;
+  dangerLight: string;
+  dangerDark: string;
+  successLight: string;
+  successDark: string;
+  warningLight: string;
+  warningDark: string;
+  infoLight: string;
+  infoDark: string;
+  default: Theme;
+
 }

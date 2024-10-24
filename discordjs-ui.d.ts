@@ -23,6 +23,7 @@ export interface UIOptions {
     functionalButtonTtl?: number
     globalMetadata?: any
     messageDefault?: UIMessageOptional
+    theme?: ThemeInput
 }
 declare function createUI(options: UIOptions): {
     openUI: (interaction: any, pathname: string) => Promise<void>
@@ -34,6 +35,7 @@ export type SetupFunctionsType = {
 }
 export type UtilityFunctionsType = {
     postChannelPrefab: typeof postChannelPrefab
+    getTheme: typeof getTheme
 }
 export type RouteFunctionsType = {
     render: typeof render

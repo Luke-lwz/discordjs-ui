@@ -3,6 +3,7 @@ import {
   NavigatePropsProps,
   RouteTree,
   SlashCommands,
+  ThemeInput,
   UIMessage,
   UIMessageOptional,
 } from "./types";
@@ -26,6 +27,9 @@ import * as discordjs from "discord.js";
 import ModalBuilder from "./utils/builders/ModalBuilder";
 import reply from "./utils/render/reply";
 import { postChannelPrefab } from "./utils/channelPrefab";
+import { DefaultTheme } from "./utils/theme/defaultTheme";
+
+import getTheme from "./utils/theme/theme";
 
 export interface UIOptions {
   client: any;
@@ -38,6 +42,7 @@ export interface UIOptions {
   functionalButtonTtl?: number; // in seconds // default: 1800 (30 minutes)
   globalMetadata?: any;
   messageDefault?: UIMessageOptional;
+  theme?: ThemeInput;
 }
 
 function createUI(options: UIOptions) {
@@ -51,6 +56,7 @@ function createUI(options: UIOptions) {
     messageDefault = {},
     slashCommands = [],
     slashCommandRegisterFunction = null,
+    theme = DefaultTheme,
   } = options || {};
 
   // if (!client) {
@@ -98,6 +104,7 @@ function createUI(options: UIOptions) {
         buttonCache,
         messageLayout: {},
         context: {},
+        theme,
       },
       async () => {
         if (interaction?.isChatInputCommand()) {
@@ -192,6 +199,7 @@ function createUI(options: UIOptions) {
         buttonCache,
         messageLayout: {},
         context: {},
+        theme
       },
       async () => {
         await navigate(pathname);
@@ -212,6 +220,7 @@ export type SetupFunctionsType = {
 
 export type UtilityFunctionsType = {
   postChannelPrefab: typeof postChannelPrefab;
+  getTheme: typeof getTheme;
 };
 
 export type RouteFunctionsType = {
@@ -239,6 +248,7 @@ const setupFunctions: SetupFunctionsType = {
 
 const utilityFunctions:  UtilityFunctionsType = {
   postChannelPrefab,
+  getTheme,
 };
 
 const routeFunctions: RouteFunctionsType = {
