@@ -10,6 +10,7 @@ import reply from "../render/reply";
 import { mergeLayout } from "../messages";
 import { AllowedFileName } from "../routes";
 import { filesDisallowedToUseNavigate } from "./constraints";
+import getTheme from "../theme/theme";
 
 async function navigate(pathname: string, options: NavigateOptions = {}) {
   // 🚨 make it so navigate cannot be used in a messageLayout.js file
@@ -157,6 +158,8 @@ async function contextWrapper(
         }
       }
 
+      const theme = getTheme();
+
       const defaultProps: NavigatePropsProps = {
         interaction: interaction,
         pathname: cleanPathname || null,
@@ -166,6 +169,7 @@ async function contextWrapper(
         globalMetadata,
         context: context.context || {},
         modal,
+        theme,
       };
 
       try {

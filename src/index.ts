@@ -211,7 +211,7 @@ function createUI(options: UIOptions) {
     runWithContext(
       {
         routes,
-        interaction: {},
+        interaction: null,
         globalMetadata,
         prefix,
         buttonCache,

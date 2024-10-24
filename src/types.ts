@@ -46,6 +46,7 @@ export interface NavigatePropsProps {
   modal?: {
     [key: string]: string;
   }
+  theme: Theme;
 }
 
 export interface NavigateRouteProps {
