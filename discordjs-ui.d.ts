@@ -28,6 +28,7 @@ export interface UIOptions {
 declare function createUI(options: UIOptions): {
     openUI: (interaction: any, pathname: string) => Promise<void>
     onInteraction: (interaction: any) => void
+    makeUiContext: (fn: () => void) => void
 }
 export type SetupFunctionsType = {
     createUI: typeof createUI

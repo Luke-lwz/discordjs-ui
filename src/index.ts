@@ -207,7 +207,25 @@ function createUI(options: UIOptions) {
     );
   }
 
-  return { openUI, onInteraction };
+  function makeUiContext(fn: () => void) {
+    runWithContext(
+      {
+        routes,
+        interaction: {},
+        globalMetadata,
+        prefix,
+        buttonCache,
+        messageLayout: {},
+        context: {},
+        theme
+      },
+      async () => {
+        await fn();
+      }
+    );
+  }
+
+  return { openUI, onInteraction, makeUiContext };
 }
 
 
