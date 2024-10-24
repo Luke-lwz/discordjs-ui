@@ -158,7 +158,7 @@ async function contextWrapper(
         }
       }
 
-      const theme = getTheme();
+      const theme = getTheme(); // 🚨 not performant, needs new solution
 
       const defaultProps: NavigatePropsProps = {
         interaction: interaction,

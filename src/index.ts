@@ -165,6 +165,8 @@ function createUI(options: UIOptions) {
               const { routeName, params, searchParams, cleanPathname } =
                 getUIFnAndRouteNameAndParams(button.currentPathname, routes);
 
+                const theme = getTheme(); // 🚨 not performant, needs new solution
+
               const props: NavigatePropsProps = {
                 pathname: cleanPathname || null,
                 route: routeName,
@@ -172,7 +174,7 @@ function createUI(options: UIOptions) {
                 searchParams,
                 interaction,
                 globalMetadata,
-
+                theme,
                 modal,
                 context: {}
               };
