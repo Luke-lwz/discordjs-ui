@@ -227,9 +227,13 @@ export interface ThemeInput  {
   success: string;
   warning: string;
   info: string;
+
+  custom?: {
+    [key: string]: string
+  }
 }
 
-export interface Theme extends ThemeInput {
+export interface ThemeWithoutDefault extends ThemeInput {
   white: string;
   black: string;
   ghost: string;
@@ -243,6 +247,11 @@ export interface Theme extends ThemeInput {
   warningDark: string;
   infoLight: string;
   infoDark: string;
-  default: Theme;
 
 }
+
+
+export interface Theme extends ThemeWithoutDefault {
+  default: ThemeWithoutDefault; // Explicitly define this property
+}
+
