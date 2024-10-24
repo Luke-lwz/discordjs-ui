@@ -1,4 +1,3 @@
-import { getContext } from "./context";
 
 interface ChannelPrefab {
   name: string;
@@ -15,7 +14,6 @@ export async function postChannelPrefab(prefab: ChannelPrefab) {
     throw new Error("Missing guild in postChannelPrefab");
   }
 
-  const { interaction, fileName, messageLayout } = getContext();
 
   let outChannel = null;
   let outMessages = [];

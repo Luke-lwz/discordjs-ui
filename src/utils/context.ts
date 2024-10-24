@@ -23,9 +23,9 @@ const setContext = (context: ContextType) => {
   contexts.set(executionAsyncId(), context);
 };
 
-export const getContext = (): ContextType | undefined => {
+export const getContext = (useableOutsideDiscordjsUi: boolean = false): ContextType | undefined => {
   const context = contexts.get(executionAsyncId());
-  if (!context) {
+  if (!context && !useableOutsideDiscordjsUi) {
     throw new Error("Cant use this function outside of a discordjs-ui route");
   }
   return context;
