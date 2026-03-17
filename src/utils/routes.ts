@@ -106,10 +106,10 @@ export const getFileTree = (dir, baseRoute = ""): RouteTree[] => {
 const maxLength = 100;
 
 const uuidLocalStorage = new LocalStorage(
-  "./discordjs-ui/localStorage/routes/uuid"
+  "./.discordjs-ui/localStorage/routes/uuid"
 );
 const routeLocalStorage = new LocalStorage(
-  "./discordjs-ui/localStorage/routes/route"
+  "./.discordjs-ui/localStorage/routes/route"
 );
 
 export function encodeRoute(route: string, prefix: string) {
